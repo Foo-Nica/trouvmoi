@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@font-face {
+    font-family: 'Poppins';
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/Poppins-Medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/Poppins-Bold.ttf') format('truetype');
+}
+
+@theme {
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-indigo-brand: #2b2a6b;
+    --color-orange-brand: #ff7a3d;
+}
