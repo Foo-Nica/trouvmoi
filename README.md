@@ -27,8 +27,8 @@ empreintes ; Laravel garde seulement les cadres).
 | --- | --- | --- |
 | 1. Socle | Laravel, Filament, files, stockage, CI | ✅ |
 | 2. Événements et envoi | Événements, QR code, envoi reprenable, miniatures, filigrane | ✅ |
-| 3. IA | Service facial auto-hébergé, indexation, recherche galerie + selfie (API) | ✅ côté serveur |
-| 4. Invité | Consentement, recherche par visage, dossier, ZIP | ⏳ prochain lot |
+| 3. IA | Service facial auto-hébergé, indexation, recherche galerie + selfie | ✅ |
+| 4. Invité | Consentement, PIN, galerie, toucher son visage, selfie, dossier, ZIP, WhatsApp, retrait, FR/EN/ES/DE | ✅ |
 | 5. Pilote | Calibration des seuils, tests de charge, pages légales | ⏳ |
 
 ## Installation (développement)
@@ -58,6 +58,8 @@ Dans un autre terminal : `php artisan serve` et `php artisan horizon` (ou `php a
 - Espace photographe : `/studio`
 - Back-office (administrateurs) : `/admin` · tableau des files : `/horizon`
 - Page invités d'un événement : `/e/{code}` (adresse contenue dans le QR code)
+- Dossier personnel d'un invité : `/d/{lien privé}`
+- Traductions des pages invités : `lang/en.json`, `lang/es.json`, `lang/de.json` (le français est la langue source)
 
 ## Tests
 

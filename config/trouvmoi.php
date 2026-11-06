@@ -39,14 +39,14 @@ return [
     'brand_domain' => env('BRAND_DOMAIN', 'trouvmoi.app'),
 
     /*
-    | Forfaits mensuels des photographes. Prix en FCFA (XOF) : à fixer par Nicanor.
+    | Forfaits mensuels des photographes. Prix mensuels en FCFA (XOF).
     | null = illimité.
     */
     'plans' => [
         'trial' => ['label' => 'Essai', 'price_xof' => 0, 'events_per_month' => 1, 'photos_per_event' => 300],
-        'starter' => ['label' => 'Starter', 'price_xof' => null, 'events_per_month' => 4, 'photos_per_event' => 3000],
-        'pro' => ['label' => 'Pro', 'price_xof' => null, 'events_per_month' => 15, 'photos_per_event' => 15000],
-        'studio' => ['label' => 'Studio', 'price_xof' => null, 'events_per_month' => null, 'photos_per_event' => 50000],
+        'starter' => ['label' => 'Starter', 'price_xof' => 2000, 'events_per_month' => 4, 'photos_per_event' => 3000],
+        'pro' => ['label' => 'Pro', 'price_xof' => 5000, 'events_per_month' => 15, 'photos_per_event' => 15000],
+        'studio' => ['label' => 'Studio', 'price_xof' => 15000, 'events_per_month' => null, 'photos_per_event' => 50000],
     ],
 
     'locales' => [

@@ -15,6 +15,9 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // Le client de test envoie « Accept-Language: en » par défaut : on simule un téléphone en français.
+        $this->withHeader('Accept-Language', 'fr-FR,fr;q=0.9');
+
         Storage::fake(config('trouvmoi.photos_disk'));
         $this->faceEngine = new FakeFaceEngine;
         $this->app->instance(FaceEngine::class, $this->faceEngine);

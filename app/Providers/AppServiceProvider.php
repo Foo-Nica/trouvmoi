@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\FaceEngine\FaceEngine;
 use App\Services\FaceEngine\HttpFaceEngine;
+use App\Services\Guests\GuestSession;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -14,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(FaceEngine::class, fn () => HttpFaceEngine::fromConfig());
+        $this->app->singleton(GuestSession::class);
     }
 
     public function boot(): void

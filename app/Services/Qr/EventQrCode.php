@@ -26,11 +26,11 @@ class EventQrCode
             size: $size,
             margin: (int) round($size / 20),
             roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            foregroundColor: new Color(43, 42, 107),
+            foregroundColor: new Color(40, 38, 103),
             backgroundColor: new Color(255, 255, 255),
             logoPath: is_file($logo) ? $logo : '',
             logoResizeToWidth: is_file($logo) ? (int) round($size * 0.2) : null,
-            logoPunchoutBackground: is_file($logo),
+            logoPunchoutBackground: is_file($logo) && $format !== 'svg',
         ))->build();
     }
 }

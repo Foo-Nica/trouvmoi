@@ -26,9 +26,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName(config('app.name').' Admin')
+            ->brandLogo(fn () => asset('images/logo-600.png'))
+            ->darkModeBrandLogo(fn () => asset('images/logo-white-600.png'))
+            ->brandLogoHeight('2.25rem')
+            ->favicon(fn () => asset('favicon.ico'))
             ->login()
             ->colors([
-                'primary' => Color::hex('#FF7A3D'),
+                'primary' => Color::hex('#FE7737'),
             ])
             ->font('Poppins')
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')

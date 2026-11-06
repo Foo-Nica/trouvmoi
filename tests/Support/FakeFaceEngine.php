@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Photo;
 use App\Services\FaceEngine\DetectedFace;
 use App\Services\FaceEngine\FaceEngine;
+use App\Services\FaceEngine\FaceMatch;
 use App\Services\FaceEngine\SelfieSearchResult;
 use Illuminate\Support\Str;
 
@@ -17,6 +18,13 @@ class FakeFaceEngine implements FaceEngine
     public array $deletedPhotos = [];
 
     public array $deletedEvents = [];
+
+    /** @var list<FaceMatch> résultats renvoyés par les recherches */
+    public array $matches = [];
+
+    public bool $selfieHasFace = true;
+
+    public array $searches = [];
 
     public function __construct(public int $facesPerPhoto = 2) {}
 
@@ -40,11 +48,15 @@ class FakeFaceEngine implements FaceEngine
 
     public function searchByFaces(Event $event, array $faceIds, ?int $limit = null): array
     {
-        return [];
+        $this->searches[] = ['faces', $faceIds];
+
+        return $this->matches;
     }
 
     public function searchBySelfie(Event $event, string $imageBytes, ?int $limit = null): SelfieSearchResult
     {
-        return new SelfieSearchResult([], true);
+        $this->searches[] = ['selfie', strlen($imageBytes)];
+
+        return new SelfieSearchResult($this->selfieHasFace ? $this->matches : [], $this->selfieHasFace);
     }
 }

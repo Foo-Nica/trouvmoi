@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
 #[Fillable([
-    'event_id', 'uploaded_by', 'original_name', 'original_path', 'preview_path', 'thumb_path',
+    'event_id', 'uploaded_by', 'original_name', 'original_path', 'preview_path', 'thumb_path', 'download_path',
     'width', 'height', 'size_bytes', 'checksum', 'status', 'faces_count', 'is_visible', 'error', 'taken_at',
 ])]
 class Photo extends Model

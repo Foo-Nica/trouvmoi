@@ -27,14 +27,18 @@ class StudioPanelProvider extends PanelProvider
             ->id('studio')
             ->path('studio')
             ->brandName(config('app.name').' Studio')
+            ->brandLogo(fn () => asset('images/logo-600.png'))
+            ->darkModeBrandLogo(fn () => asset('images/logo-white-600.png'))
+            ->brandLogoHeight('2.25rem')
+            ->favicon(fn () => asset('favicon.ico'))
             ->login()
             ->registration()
             ->passwordReset()
             ->emailVerification()
             ->profile()
             ->colors([
-                'primary' => Color::hex('#2B2A6B'),
-                'warning' => Color::hex('#FF7A3D'),
+                'primary' => Color::hex('#282667'),
+                'warning' => Color::hex('#FE7737'),
             ])
             ->font('Poppins')
             ->discoverResources(in: app_path('Filament/Studio/Resources'), for: 'App\Filament\Studio\Resources')

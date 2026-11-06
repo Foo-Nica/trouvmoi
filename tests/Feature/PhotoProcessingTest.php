@@ -38,6 +38,7 @@ class PhotoProcessingTest extends TestCase
         $this->assertSame(PhotoStatus::Processed, $photo->status);
         $this->assertSame([3000, 2000], [$photo->width, $photo->height]);
         foreach ([$photo->thumb_path, $photo->preview_path, $photo->download_path] as $path) {
+            $this->assertNotNull($path);
             Storage::disk(Photo::disk())->assertExists($path);
         }
         [$w, $h] = getimagesizefromstring(Storage::disk(Photo::disk())->get($photo->thumb_path));
