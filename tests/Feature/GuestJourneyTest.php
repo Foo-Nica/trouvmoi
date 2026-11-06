@@ -12,12 +12,14 @@ use App\Models\FaceSearch;
 use App\Models\Folder;
 use App\Models\Photo;
 use App\Models\RemovalRequest;
+use App\Notifications\RemovalRequested;
 use App\Services\FaceEngine\FaceEngine;
 use App\Services\FaceEngine\FaceEngineException;
 use App\Services\FaceEngine\FaceMatch;
 use App\Services\Guests\GuestSession;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
@@ -285,12 +287,16 @@ class GuestJourneyTest extends TestCase
         $this->getJson(route('event.photos', $this->event->slug))->assertJsonPath('total', 3);
     }
 
-    public function test_removal_request(): void
+    public function test_removal_request_notifies_the_photographer_once(): void
     {
+        Notification::fake();
+
         $this->post(route('event.removal', [$this->event->slug, $this->photos[2]->id]), ['reason' => 'Je ne veux pas'])
             ->assertRedirect()->assertSessionHas('status');
+        $this->post(route('event.removal', [$this->event->slug, $this->photos[2]->id]), ['reason' => 'Je ne veux pas']);
 
         $this->assertSame('pending', RemovalRequest::sole()->status);
+        Notification::assertSentToTimes($this->event->owner, RemovalRequested::class, 1);
     }
 
     public function test_language_switch(): void

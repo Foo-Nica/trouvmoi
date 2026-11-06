@@ -10,6 +10,7 @@
             <li>{{ __('Les données faciales de l\'événement sont supprimées automatiquement le :date.', ['date' => $event->expires_at?->translatedFormat('j F Y')]) }}</li>
             <li>{{ __('Vous pouvez demander le retrait d\'une photo à tout moment.') }}</li>
         </ul>
+        <a href="{{ route('legal.privacy') }}" target="_blank" class="mt-2 inline-block font-medium text-orange-brand underline">{{ __('En savoir plus sur vos données') }}</a>
     </div>
     <label class="flex items-start gap-3 text-sm text-slate-700">
         <input type="checkbox" name="accept" value="1" required class="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-300 accent-orange-brand">

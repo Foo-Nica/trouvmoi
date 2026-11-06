@@ -47,6 +47,10 @@
     <footer class="mx-auto max-w-3xl px-4 pb-10 pt-4 text-center text-xs text-slate-500">
         <img src="{{ asset('images/logo-600.png') }}" alt="" class="mx-auto mb-2 h-5 w-auto opacity-70">
         {{ __('Retrouvez vos photos d\'événement en un instant') }}
+        <nav class="mt-3 flex justify-center gap-4">
+            <a href="{{ route('legal.privacy') }}" class="hover:text-indigo-brand">{{ __('Confidentialité') }}</a>
+            <a href="{{ route('legal.terms') }}" class="hover:text-indigo-brand">{{ __('Conditions d\'utilisation') }}</a>
+        </nav>
     </footer>
 </body>
 </html>

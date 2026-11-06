@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Enums\EventStatus;
 use App\Enums\PhotoStatus;
+use App\Jobs\DeleteEventFiles;
 use App\Jobs\IndexPhotoFaces;
 use App\Jobs\ProcessPhoto;
 use App\Jobs\PurgeEventFaces;
@@ -109,15 +111,41 @@ class PhotoProcessingTest extends TestCase
         $this->assertSame([$event->id], $this->faceEngine->deletedEvents);
     }
 
-    public function test_scheduler_purges_only_expired_events(): void
+    public function test_retention_purges_faces_at_expiry_then_photos_after_grace_period(): void
     {
         Queue::fake();
-        $expired = Event::factory()->create(['event_date' => now()->subDays(100), 'retention_days' => 30]);
-        Event::factory()->create(['event_date' => now()->subDays(10), 'retention_days' => 30]);
+        config(['trouvmoi.photos_grace_days' => 30]);
+        $active = Event::factory()->create(['event_date' => now()->subDays(10), 'retention_days' => 30]);
+        $justExpired = Event::factory()->create(['event_date' => now()->subDays(40), 'retention_days' => 30]);
+        $longExpired = Event::factory()->create(['event_date' => now()->subDays(100), 'retention_days' => 30]);
+        $longExpired->forceFill(['faces_purged_at' => now()->subDays(60), 'photos_count' => 1])->save();
+        $oldPhoto = Photo::factory()->for($longExpired)->create();
 
-        $this->artisan('schedule:test', ['--name' => 'purge-expired-events'])->assertSuccessful();
+        $this->artisan('events:purge-expired')->assertSuccessful();
 
         Queue::assertPushed(PurgeEventFaces::class, 1);
-        Queue::assertPushed(PurgeEventFaces::class, fn ($job) => $job->event->is($expired));
+        Queue::assertPushed(PurgeEventFaces::class, fn ($job) => $job->event->is($justExpired));
+        $this->assertSame(EventStatus::Archived, $justExpired->fresh()->status);
+        $this->assertSame(EventStatus::Published, $active->fresh()->status);
+
+        $this->assertModelMissing($oldPhoto);
+        $this->assertSame(0, $longExpired->fresh()->photos_count);
+        Queue::assertPushed(DeleteEventFiles::class, fn ($job) => $job->eventId === $longExpired->id);
+    }
+
+    public function test_retention_command_is_scheduled_daily(): void
+    {
+        $this->artisan('schedule:list')->expectsOutputToContain('events:purge-expired')->assertSuccessful();
+    }
+
+    public function test_deleting_an_event_removes_its_files(): void
+    {
+        $photo = $this->photo();
+        $event = $photo->event;
+
+        $event->delete();
+        DeleteEventFiles::dispatchSync($event->id);
+
+        Storage::disk(Photo::disk())->assertMissing($photo->original_path);
     }
 }

@@ -11,6 +11,8 @@ use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->middleware(SetLocale::class)->name('home');
+Route::view('confidentialite', 'legal.privacy')->name('legal.privacy');
+Route::view('conditions', 'legal.terms')->name('legal.terms');
 
 // Espace photographe (hors pages Filament) : envoi des photos et QR codes.
 Route::middleware(['auth', 'verified:filament.studio.auth.email-verification.prompt'])->prefix('studio')->name('studio.')->group(function () {

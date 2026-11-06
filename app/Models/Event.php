@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AccessMode;
 use App\Enums\EventStatus;
+use App\Jobs\DeleteEventFiles;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -57,6 +58,9 @@ class Event extends Model
         static::creating(function (Event $event): void {
             $event->slug ??= static::uniqueSlug();
         });
+
+        // Les fichiers sont supprimés en arrière-plan une fois l'événement effacé.
+        static::deleted(fn (Event $event) => DeleteEventFiles::dispatch($event->id, $event->cover_path));
 
         static::saving(function (Event $event): void {
             $start = $event->event_date ?? $event->created_at ?? now();

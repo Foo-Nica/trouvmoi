@@ -8,6 +8,7 @@ use App\Filament\Studio\Resources\Events\Pages\ListEvents;
 use App\Filament\Studio\Resources\Events\Pages\ManageEventPhotos;
 use App\Filament\Studio\Resources\Events\Schemas\EventForm;
 use App\Filament\Studio\Resources\Events\Tables\EventsTable;
+use App\Filament\Studio\Resources\Events\Widgets\EventStatsOverview;
 use App\Models\Event;
 use BackedEnum;
 use Filament\Pages\Enums\SubNavigationPosition;
@@ -58,6 +59,11 @@ class EventResource extends Resource
             EditEvent::class,
             ManageEventPhotos::class,
         ]);
+    }
+
+    public static function getWidgets(): array
+    {
+        return [EventStatsOverview::class];
     }
 
     public static function getPages(): array

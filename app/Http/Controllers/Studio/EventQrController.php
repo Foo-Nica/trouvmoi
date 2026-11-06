@@ -12,7 +12,8 @@ class EventQrController extends Controller
 {
     public function __invoke(Event $event, string $format, EventQrCode $qr): Response
     {
-        abort_unless($event->isAccessibleBy(request()->user()), 403);
+        // 404 plutôt que 403 : ne pas révéler l'existence de l'événement d'un autre photographe.
+        abort_unless($event->isAccessibleBy(request()->user()), 404);
 
         $result = $qr->make($event, $format);
         $filename = 'qr-'.Str::slug($event->title).'.'.$format;

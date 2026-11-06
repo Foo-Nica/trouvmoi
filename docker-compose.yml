@@ -1,0 +1,45 @@
+# Services d'appui pour le développement local.
+# Laravel tourne sur votre machine (php artisan serve / composer run dev).
+#
+#   docker compose up -d face          # seulement le service de reconnaissance faciale
+#   docker compose up -d               # + MySQL, Redis et Mailpit (e-mails de test)
+#
+# Le jeton du service IA est lu dans le .env de Laravel (FACE_ENGINE_TOKEN).
+
+services:
+  face:
+    build: ./face-service
+    environment:
+      FACE_API_TOKEN: ${FACE_ENGINE_TOKEN:?Définissez FACE_ENGINE_TOKEN dans .env}
+    ports:
+      - "8001:8001"
+    volumes:
+      - face-data:/data
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: trouvmoi
+      MYSQL_USER: trouvmoi
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"   # boîte de réception : http://localhost:8025
+      - "1025:1025"   # SMTP
+
+volumes:
+  face-data:
+  mysql-data:

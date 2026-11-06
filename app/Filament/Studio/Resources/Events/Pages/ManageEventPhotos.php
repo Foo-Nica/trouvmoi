@@ -4,6 +4,7 @@ namespace App\Filament\Studio\Resources\Events\Pages;
 
 use App\Enums\PhotoStatus;
 use App\Filament\Studio\Resources\Events\EventResource;
+use App\Filament\Studio\Resources\Events\Widgets\EventStatsOverview;
 use App\Jobs\ProcessPhoto;
 use App\Models\Photo;
 use App\Services\Photos\PhotoRemover;
@@ -36,6 +37,11 @@ class ManageEventPhotos extends ManageRelatedRecords
     public static function getNavigationIcon(): ?string
     {
         return 'heroicon-o-photo';
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [EventStatsOverview::class];
     }
 
     public function getSubheading(): ?string

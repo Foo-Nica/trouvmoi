@@ -51,7 +51,7 @@ class PhotoUploadTest extends TestCase
         $this->assertSame(1, $event->fresh()->photos_count);
     }
 
-    public function test_assistant_can_upload_but_stranger_cannot(): void
+    public function test_assistant_can_upload_but_stranger_gets_not_found(): void
     {
         Queue::fake();
         $event = Event::factory()->create();
@@ -59,7 +59,7 @@ class PhotoUploadTest extends TestCase
         $event->members()->attach($assistant, ['role' => 'assistant']);
 
         $this->upload($assistant, $event)->assertCreated();
-        $this->upload(User::factory()->create(), $event)->assertForbidden();
+        $this->upload(User::factory()->create(), $event)->assertNotFound();
     }
 
     public function test_rejects_non_images_and_guests(): void

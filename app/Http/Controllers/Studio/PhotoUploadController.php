@@ -14,7 +14,8 @@ class PhotoUploadController extends Controller
     public function __invoke(Request $request, Event $event, PhotoUploader $uploader): JsonResponse
     {
         $user = $request->user();
-        abort_unless($event->isAccessibleBy($user), 403);
+        // 404 plutôt que 403 : ne pas révéler l'existence de l'événement d'un autre photographe.
+        abort_unless($event->isAccessibleBy($user), 404);
 
         $limit = $event->owner->planLimits()['photos_per_event'];
         if ($limit !== null && $event->photos_count >= $limit) {

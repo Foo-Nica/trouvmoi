@@ -29,36 +29,73 @@ empreintes ; Laravel garde seulement les cadres).
 | 2. Événements et envoi | Événements, QR code, envoi reprenable, miniatures, filigrane | ✅ |
 | 3. IA | Service facial auto-hébergé, indexation, recherche galerie + selfie | ✅ |
 | 4. Invité | Consentement, PIN, galerie, toucher son visage, selfie, dossier, ZIP, WhatsApp, retrait, FR/EN/ES/DE | ✅ |
-| 5. Pilote | Calibration des seuils, tests de charge, pages légales | ⏳ |
+| 5. Finitions | Pages légales, en-têtes de sécurité, durée de conservation, statistiques, alertes de retrait | ✅ |
+| Reste | Calibration sur de vraies photos, paiement mobile money | ⏳ |
 
-## Installation (développement)
+## Installation locale (VS Code)
 
-Prérequis : PHP 8.3+ (extensions gd, exif, intl, zip, pcntl), Composer, Node 22, Python 3.11+,
-Redis, MySQL 8.
+Prérequis : **PHP 8.3+** avec les extensions `gd`, `exif`, `intl`, `zip`, `fileinfo`, `pdo_sqlite`
+(Laragon, Herd ou XAMPP sous Windows), **Composer**, **Node 22**, et pour la reconnaissance faciale
+**Python 3.11+** ou **Docker Desktop**.
+
+### 1. Application Laravel
+
+L'archive livrée contient déjà `vendor/` et les fichiers compilés (`public/build`) : les étapes
+`composer install` et `npm run build` ne sont nécessaires qu'après un `git clone`.
 
 ```bash
-composer install
-npm install && npm run build
-cp .env.example .env && php artisan key:generate
-# Renseigner DB_*, puis :
-php artisan migrate --seed          # comptes démo : admin@trouvmoi.test / photo@trouvmoi.test (mot de passe : password)
+composer install                     # seulement après un git clone
+npm install && npm run build         # seulement après un git clone
+cp .env.example .env                 # Windows : copy .env.example .env
+php artisan key:generate
+php artisan migrate --seed           # base SQLite + comptes de démonstration
 php artisan storage:link
+composer run dev                     # serveur + file de traitement + Vite
+```
 
-# Service de reconnaissance faciale
+Ouvrez <http://127.0.0.1:8000>. Comptes de démonstration (mot de passe : `password`) :
+
+| Compte | Accès |
+| --- | --- |
+| `photo@trouvmoi.test` | Espace photographe `/studio` |
+| `admin@trouvmoi.test` | Back-office `/admin` (et `/horizon` en production) |
+
+Les e-mails (vérification d'adresse, demandes de retrait) sont écrits dans `storage/logs/laravel.log`
+tant que `MAIL_MAILER=log`. Avec Docker, `MAIL_MAILER=smtp` et `MAIL_PORT=1025` les affichent dans
+Mailpit (<http://localhost:8025>).
+
+### 2. Service de reconnaissance faciale
+
+Choisissez un jeton secret et mettez la **même valeur** dans `FACE_ENGINE_TOKEN` (`.env` de Laravel)
+et `FACE_API_TOKEN` (`face-service/.env`).
+
+Avec Docker :
+
+```bash
+docker compose up -d face            # lit FACE_ENGINE_TOKEN dans .env
+```
+
+Ou avec Python :
+
+```bash
 cd face-service
-python3 -m venv .venv && . .venv/bin/activate
+python -m venv .venv
+.venv\Scripts\activate               # macOS / Linux : source .venv/bin/activate
 pip install -r requirements-dev.txt
-sh scripts/download_models.sh
-echo "FACE_API_TOKEN=un-long-jeton" > .env          # même valeur que FACE_ENGINE_TOKEN côté Laravel
+sh scripts/download_models.sh        # inutile si models/ contient déjà les 2 fichiers .onnx
+echo FACE_API_TOKEN=votre-jeton > .env
 uvicorn app.main:app_factory --factory --port 8001
 ```
 
-Dans un autre terminal : `php artisan serve` et `php artisan horizon` (ou `php artisan queue:work --queue=photos,faces,default`).
+Sans ce service, l'envoi et l'affichage des photos fonctionnent, mais les photos passent en
+« Erreur » à l'étape de reconnaissance faciale (bouton « Relancer » une fois le service démarré).
 
-- Espace photographe : `/studio`
-- Back-office (administrateurs) : `/admin` · tableau des files : `/horizon`
+### Adresses utiles
+
+- Espace photographe : `/studio` · back-office : `/admin`
 - Page invités d'un événement : `/e/{code}` (adresse contenue dans le QR code)
 - Dossier personnel d'un invité : `/d/{lien privé}`
+- Pages légales : `/confidentialite` et `/conditions` (mentions dans `.env` : `LEGAL_*`)
 - Traductions des pages invités : `lang/en.json`, `lang/es.json`, `lang/de.json` (le français est la langue source)
 
 ## Tests
@@ -70,12 +107,14 @@ cd face-service && pytest           # service IA
 
 ## Production
 
-- `QUEUE_CONNECTION=redis`, `CACHE_STORE=redis`, Horizon supervisé (Laravel Forge ou Ploi).
+- `DB_CONNECTION=mysql`, `QUEUE_CONNECTION=redis`, `CACHE_STORE=redis`, Horizon supervisé
+  (Laravel Forge ou Ploi, serveur Linux).
 - `PHOTOS_DISK=r2` avec les variables `R2_*` (pas de frais de sortie sur les téléchargements).
 - Photos HEIC : installer l'extension PHP Imagick compilée avec libheif.
 - Le service IA tourne sur le même serveur ou un serveur voisin, jamais exposé publiquement
   (`docker build -t trouvmoi-face face-service`).
-- Planificateur : `* * * * * php artisan schedule:run` (suppression automatique des données
-  faciales à l'expiration des événements).
+- Planificateur : `* * * * * php artisan schedule:run`. La commande `events:purge-expired`
+  supprime chaque nuit les données faciales des événements expirés, puis leurs photos
+  `PHOTOS_GRACE_DAYS` jours plus tard.
 - Avant le lancement : calibrer les seuils avec `face-service/scripts/calibrate.py` sur de
-  vraies photos, et obtenir l'autorisation de l'APDP.
+  vraies photos, et renseigner `LEGAL_APDP_REFERENCE`.

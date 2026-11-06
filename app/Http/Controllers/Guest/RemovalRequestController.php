@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guest;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Guest\Concerns\ResolvesEvent;
 use App\Models\RemovalRequest;
+use App\Notifications\RemovalRequested;
 use App\Services\Guests\GuestSession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,10 +25,14 @@ class RemovalRequestController extends Controller
             'contact' => ['nullable', 'string', 'max:120'],
         ]);
 
-        RemovalRequest::firstOrCreate(
+        $removalRequest = RemovalRequest::firstOrCreate(
             ['event_id' => $event->id, 'photo_id' => $photo->id, 'status' => 'pending', 'guest_id' => $guests->current()?->id],
             ['reason' => $data['reason'] ?? null, 'contact' => $data['contact'] ?? null],
         );
+
+        if ($removalRequest->wasRecentlyCreated) {
+            $event->owner->notify(new RemovalRequested($removalRequest));
+        }
 
         return back()->with('status', __('Demande envoyée. Le photographe retirera la photo sous 72 h.'));
     }

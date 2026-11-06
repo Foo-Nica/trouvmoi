@@ -35,6 +35,9 @@ return [
 
     'default_retention_days' => 60,
 
+    // Après l'expiration (données faciales déjà supprimées), délai avant la suppression des photos.
+    'photos_grace_days' => (int) env('PHOTOS_GRACE_DAYS', 30),
+
     // Domaine affiché dans le filigrane et sur les affiches QR.
     'brand_domain' => env('BRAND_DOMAIN', 'trouvmoi.app'),
 
@@ -54,6 +57,17 @@ return [
         'en' => 'English',
         'es' => 'Español',
         'de' => 'Deutsch',
+    ],
+
+    /*
+    | Mentions des pages légales (/confidentialite et /conditions).
+    */
+    'legal' => [
+        'company' => env('LEGAL_COMPANY', 'Nicanor KSH Solutions'),
+        'address' => env('LEGAL_ADDRESS', 'Abomey-Calavi, Bénin'),
+        'email' => env('LEGAL_EMAIL', 'contact@trouvmoi.app'),
+        'apdp_reference' => env('LEGAL_APDP_REFERENCE'),
+        'updated_at' => '2026-11-07',
     ],
 
 ];
