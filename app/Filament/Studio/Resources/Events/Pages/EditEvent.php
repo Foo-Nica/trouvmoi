@@ -4,10 +4,13 @@ namespace App\Filament\Studio\Resources\Events\Pages;
 
 use App\Enums\AccessMode;
 use App\Filament\Studio\Resources\Events\EventResource;
+use App\Jobs\ProcessPhoto;
 use App\Jobs\PurgeEventFaces;
+use App\Models\Photo;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Icons\Heroicon;
 
@@ -46,6 +49,19 @@ class EditEvent extends EditRecord
 
     protected function afterSave(): void
     {
+        // Filigrane activé ou retiré : les images déjà publiées sont refaites.
+        if ($this->record->wasChanged('watermark_enabled')) {
+            $this->record->photos()->whereNotNull('thumb_path')->each(
+                fn (Photo $photo) => ProcessPhoto::dispatch($photo, indexFaces: false)
+            );
+
+            Notification::make()
+                ->title($this->record->watermark_enabled ? 'Ajout du filigrane en cours' : 'Retrait du filigrane en cours')
+                ->body('Les photos déjà publiées sont mises à jour en arrière-plan.')
+                ->info()
+                ->send();
+        }
+
         $pin = $this->data['pin'] ?? null;
 
         if ($this->record->access_mode !== AccessMode::Pin) {

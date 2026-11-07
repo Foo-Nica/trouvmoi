@@ -5,6 +5,7 @@ namespace App\Filament\Studio\Resources\Events\Pages;
 use App\Enums\PhotoStatus;
 use App\Filament\Studio\Resources\Events\EventResource;
 use App\Filament\Studio\Resources\Events\Widgets\EventStatsOverview;
+use App\Jobs\IndexPhotoFaces;
 use App\Jobs\ProcessPhoto;
 use App\Models\Photo;
 use App\Services\Photos\PhotoRemover;
@@ -37,6 +38,28 @@ class ManageEventPhotos extends ManageRelatedRecords
     public static function getNavigationIcon(): ?string
     {
         return 'heroicon-o-photo';
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('reindex')
+                ->label('Relancer la reconnaissance faciale')
+                ->icon(Heroicon::OutlinedArrowPath)
+                ->color('gray')
+                ->visible(fn () => $this->getRecord()->faceSearchEnabled())
+                ->requiresConfirmation()
+                ->modalDescription('Toutes les photos de l\'événement sont analysées à nouveau. Utile après une panne du service de reconnaissance faciale ou un changement de réglage.')
+                ->action(function () {
+                    $count = 0;
+                    $this->getRecord()->photos()->whereNotNull('thumb_path')->each(function (Photo $photo) use (&$count) {
+                        IndexPhotoFaces::dispatch($photo);
+                        $count++;
+                    });
+
+                    Notification::make()->title("{$count} photo(s) en cours d'analyse")->success()->send();
+                }),
+        ];
     }
 
     protected function getHeaderWidgets(): array

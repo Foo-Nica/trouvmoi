@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
 
-/** Miniature, aperçu et version téléchargeable, puis indexation des visages. */
+/**
+ * Miniature, aperçu et version téléchargeable, puis indexation des visages.
+ * Avec $indexFaces à false (changement de filigrane), seules les images sont refaites.
+ */
 class ProcessPhoto implements ShouldQueue
 {
     use Queueable;
@@ -22,7 +25,7 @@ class ProcessPhoto implements ShouldQueue
 
     public array $backoff = [10, 60];
 
-    public function __construct(public Photo $photo)
+    public function __construct(public Photo $photo, public bool $indexFaces = true)
     {
         $this->onQueue('photos');
     }
@@ -52,11 +55,11 @@ class ProcessPhoto implements ShouldQueue
         $photo->update($paths + [
             'width' => $result['width'],
             'height' => $result['height'],
-            'status' => PhotoStatus::Processed,
+            'status' => $this->indexFaces || $photo->status !== PhotoStatus::Indexed ? PhotoStatus::Processed : PhotoStatus::Indexed,
             'error' => null,
         ]);
 
-        if ($event->faceSearchEnabled()) {
+        if ($this->indexFaces && $event->faceSearchEnabled()) {
             IndexPhotoFaces::dispatch($photo);
         }
     }

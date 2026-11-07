@@ -27,8 +27,9 @@ class Settings(BaseSettings):
     detect_score_threshold: float = 0.8
     # Visages ignorés en dessous de cette taille (côté le plus court, en pixels de l'original).
     min_face_size: int = 60
-    # Netteté minimale (variance du laplacien sur le visage aligné 112x112). 0 = désactivé.
-    min_sharpness: float = 20.0
+    # Netteté minimale (variance du laplacien sur le visage aligné 112x112). 0 = désactivé
+    # (par défaut, tant que le seuil n'est pas calibré sur de vraies photos).
+    min_sharpness: float = 0.0
 
     # Similarité cosinus SFace : 0.363 est le seuil « même personne » publié par OpenCV.
     match_threshold: float = 0.363

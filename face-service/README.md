@@ -49,7 +49,7 @@ Plusieurs `face_ids` (photos déjà confirmées par l'invité) affinent la reche
 | `FACE_MATCH_THRESHOLD` | 0.363 | Similarité minimale (seuil publié par OpenCV pour SFace) |
 | `FACE_STRONG_THRESHOLD` | 0.45 | Au-dessus : « Vos photos » |
 | `FACE_MIN_FACE_SIZE` | 60 | Visages plus petits ignorés (pixels) |
-| `FACE_MIN_SHARPNESS` | 20 | Visages trop flous ignorés (0 = désactivé) |
+| `FACE_MIN_SHARPNESS` | 0 | Visages trop flous ignorés (0 = désactivé, à calibrer) |
 
 Ces valeurs sont des points de départ. Avant le lancement, calibrez-les sur de vraies
 photos d'événement (peaux foncées, éclairage de soirée, flash) avec

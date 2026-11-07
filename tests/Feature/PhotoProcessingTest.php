@@ -48,6 +48,19 @@ class PhotoProcessingTest extends TestCase
         Queue::assertPushed(IndexPhotoFaces::class);
     }
 
+    public function test_redoing_images_keeps_the_indexed_status_and_skips_indexing(): void
+    {
+        Queue::fake([IndexPhotoFaces::class]);
+        $photo = $this->photo(['watermark_enabled' => false]);
+        $photo->update(['status' => PhotoStatus::Indexed, 'faces_count' => 2]);
+
+        ProcessPhoto::dispatchSync($photo, false);
+
+        $this->assertSame(PhotoStatus::Indexed, $photo->fresh()->status);
+        $this->assertSame(2, $photo->fresh()->faces_count);
+        Queue::assertNotPushed(IndexPhotoFaces::class);
+    }
+
     public function test_events_with_minors_are_never_indexed(): void
     {
         Queue::fake([IndexPhotoFaces::class]);

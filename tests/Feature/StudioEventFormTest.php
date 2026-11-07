@@ -3,12 +3,18 @@
 namespace Tests\Feature;
 
 use App\Enums\AccessMode;
+use App\Enums\PhotoStatus;
 use App\Filament\Studio\Resources\Events\Pages\CreateEvent;
 use App\Filament\Studio\Resources\Events\Pages\EditEvent;
+use App\Filament\Studio\Resources\Events\Pages\ManageEventPhotos;
+use App\Jobs\IndexPhotoFaces;
+use App\Jobs\ProcessPhoto;
 use App\Models\Event;
+use App\Models\Photo;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -67,6 +73,50 @@ class StudioEventFormTest extends TestCase
             ->call('create');
 
         $this->assertSame(1, Event::count());
+    }
+
+    public function test_turning_watermark_off_redoes_published_images_without_reindexing(): void
+    {
+        Queue::fake();
+        $event = Event::factory()->create(['watermark_enabled' => true]);
+        $published = Photo::factory()->for($event)->create(['thumb_path' => 't.webp', 'status' => PhotoStatus::Indexed]);
+        Photo::factory()->for($event)->create(['thumb_path' => null]);
+        $this->actingAs($event->owner);
+
+        Livewire::test(EditEvent::class, ['record' => $event->getRouteKey()])
+            ->fillForm(['watermark_enabled' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        Queue::assertPushed(ProcessPhoto::class, 1);
+        Queue::assertPushed(ProcessPhoto::class, fn (ProcessPhoto $job) => $job->photo->is($published) && ! $job->indexFaces);
+    }
+
+    public function test_saving_without_watermark_change_redoes_nothing(): void
+    {
+        Queue::fake();
+        $event = Event::factory()->create();
+        Photo::factory()->for($event)->create(['thumb_path' => 't.webp']);
+        $this->actingAs($event->owner);
+
+        Livewire::test(EditEvent::class, ['record' => $event->getRouteKey()])
+            ->fillForm(['title' => 'Nouveau titre'])
+            ->call('save');
+
+        Queue::assertNotPushed(ProcessPhoto::class);
+    }
+
+    public function test_relaunching_face_recognition_queues_every_published_photo(): void
+    {
+        Queue::fake();
+        $event = Event::factory()->create();
+        Photo::factory()->for($event)->count(2)->create(['thumb_path' => 't.webp']);
+        $this->actingAs($event->owner);
+
+        Livewire::test(ManageEventPhotos::class, ['record' => $event->getRouteKey()])
+            ->callAction('reindex');
+
+        Queue::assertPushed(IndexPhotoFaces::class, 2);
     }
 
     public function test_switching_away_from_pin_mode_clears_the_pin(): void
