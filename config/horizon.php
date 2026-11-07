@@ -215,7 +215,8 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
+                // Le traitement d'une photo peut utiliser jusqu'à 1 Go de mémoire.
+                'maxProcesses' => 3,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],

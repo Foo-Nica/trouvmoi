@@ -13,6 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Railway (et tout hébergeur derrière un proxy) termine le HTTPS en amont.
+        $middleware->trustProxies(at: '*');
         $middleware->redirectGuestsTo(fn () => route('filament.studio.auth.login'));
         $middleware->appendToGroup('web', SecurityHeaders::class);
     })

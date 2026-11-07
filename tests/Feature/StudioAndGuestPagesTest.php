@@ -113,6 +113,13 @@ class StudioAndGuestPagesTest extends TestCase
         $this->get('/')->assertSee(route('legal.privacy'));
     }
 
+    public function test_links_use_https_behind_the_hosting_proxy(): void
+    {
+        $this->withHeaders(['X-Forwarded-Proto' => 'https', 'X-Forwarded-Host' => 'trouvmoi.up.railway.app'])
+            ->get('/')
+            ->assertSee('https://trouvmoi.up.railway.app/confidentialite', false);
+    }
+
     public function test_unknown_event_is_404(): void
     {
         $this->get('/e/inconnu1')->assertNotFound();

@@ -19,4 +19,6 @@ VOLUME /data
 EXPOSE 8001
 
 # Un worker par cœur CPU ; les modèles sont chargés une fois par thread.
-CMD ["uvicorn", "app.main:app_factory", "--factory", "--host", "0.0.0.0", "--port", "8001", "--workers", "2"]
+# FACE_HOST=:: pour un réseau privé IPv6 (anciens environnements Railway).
+ENV FACE_HOST=0.0.0.0 FACE_PORT=8001 FACE_WORKERS=2
+CMD ["sh", "-c", "exec uvicorn app.main:app_factory --factory --host \"$FACE_HOST\" --port \"${PORT:-$FACE_PORT}\" --workers \"$FACE_WORKERS\""]

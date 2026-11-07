@@ -60,6 +60,14 @@ return [
     ],
 
     /*
+    | Compte administrateur créé ou mis à jour par « php artisan app:deploy » (mise en production).
+    */
+    'admin' => [
+        'email' => env('ADMIN_EMAIL'),
+        'password' => env('ADMIN_PASSWORD'),
+    ],
+
+    /*
     | Mentions des pages légales (/confidentialite et /conditions).
     */
     'legal' => [

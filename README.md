@@ -107,6 +107,16 @@ cd face-service && pytest           # service IA
 
 ## Production
 
+### Railway
+
+Le dépôt contient la configuration Railway : `railway/web.json` (site), `railway/worker.json`
+(Horizon), `railway/scheduler.json` (tâches planifiées) et `face-service/railway.json` (IA).
+Chaque service Railway pointe vers son fichier (Settings → Config-as-code). Le site exécute
+`php artisan app:deploy` avant chaque mise en ligne : migrations, puis compte administrateur
+défini par `ADMIN_EMAIL` et `ADMIN_PASSWORD`. Les réglages PHP de production sont dans `php.ini`.
+
+### Généralités
+
 - `DB_CONNECTION=mysql`, `QUEUE_CONNECTION=redis`, `CACHE_STORE=redis`, Horizon supervisé
   (Laravel Forge ou Ploi, serveur Linux).
 - `PHOTOS_DISK=r2` avec les variables `R2_*` (pas de frais de sortie sur les téléchargements).
