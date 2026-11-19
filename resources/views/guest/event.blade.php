@@ -5,7 +5,7 @@
 
             @if ($faceSearch)
                 <section id="rechercher" class="scroll-mt-20 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-                    <h2 class="text-lg font-semibold text-indigo-brand">{{ __('Retrouver mes photos') }}</h2>
+                    <h2 class="text-lg font-semibold text-ink">{{ __('Retrouver mes photos') }}</h2>
 
                     @if (! $consented)
                         <p class="mb-4 mt-1 text-sm text-slate-600">
@@ -14,8 +14,8 @@
                         @include('guest.partials.consent', ['next' => route('event.show', $event->slug, false).'#rechercher'])
                     @elseif ($galleryVisible)
                         <ol class="mb-4 mt-2 space-y-1.5 text-sm text-slate-600">
-                            <li><span class="font-semibold text-orange-brand">1.</span> {{ __('Touchez une photo de la galerie où vous apparaissez.') }}</li>
-                            <li><span class="font-semibold text-orange-brand">2.</span> {{ __('Touchez votre visage sur cette photo.') }}</li>
+                            <li><span class="font-semibold text-accent-strong">1.</span> {{ __('Touchez une photo de la galerie où vous apparaissez.') }}</li>
+                            <li><span class="font-semibold text-accent-strong">2.</span> {{ __('Touchez votre visage sur cette photo.') }}</li>
                         </ol>
                         <p class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">{{ __('ou bien') }}</p>
                         @include('guest.partials.selfie', ['primary' => false, 'label' => __('Chercher avec un selfie')])
@@ -33,7 +33,7 @@
                                 @foreach ($folders as $folder)
                                     <li>
                                         <a href="{{ $folder->privateUrl() }}" class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm hover:bg-slate-100">
-                                            <span class="font-medium text-indigo-brand">{{ $folder->name ?: __('Mes photos') }}</span>
+                                            <span class="font-medium text-ink">{{ $folder->name ?: __('Mes photos') }}</span>
                                             <span class="text-slate-500">{{ trans_choice(':count photo|:count photos', $folder->keptPhotos()->count()) }} →</span>
                                         </a>
                                     </li>
@@ -48,7 +48,7 @@
         @if ($galleryVisible)
             <section x-data="gallery(@js($firstPage), @js(route('event.photos', $event->slug)))">
                 <div class="mb-3 flex items-baseline justify-between">
-                    <h2 class="text-lg font-semibold text-indigo-brand">{{ __('Toutes les photos') }}</h2>
+                    <h2 class="text-lg font-semibold text-ink">{{ __('Toutes les photos') }}</h2>
                     <span class="text-sm text-slate-500">{{ trans_choice(':count photo|:count photos', $firstPage['total']) }}</span>
                 </div>
 

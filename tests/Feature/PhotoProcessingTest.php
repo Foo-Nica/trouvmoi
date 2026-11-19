@@ -10,6 +10,7 @@ use App\Jobs\ProcessPhoto;
 use App\Jobs\PurgeEventFaces;
 use App\Models\Event;
 use App\Models\Photo;
+use App\Services\Images\ImageProcessor;
 use App\Services\Photos\PhotoRemover;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -46,6 +47,23 @@ class PhotoProcessingTest extends TestCase
         [$w, $h] = getimagesizefromstring(Storage::disk(Photo::disk())->get($photo->thumb_path));
         $this->assertSame(400, max($w, $h));
         Queue::assertPushed(IndexPhotoFaces::class);
+    }
+
+    public function test_watermark_adds_the_logo_to_the_bottom_right_corner_only(): void
+    {
+        $processor = new ImageProcessor;
+        $bytes = $this->jpeg(2000, 1500);
+
+        $plain = imagecreatefromstring($processor->process($bytes)['download']);
+        $marked = imagecreatefromstring($processor->process($bytes, watermark: true)['download']);
+
+        $changedPixels = fn (int $fromX, int $fromY, int $toX, int $toY): int => collect(range($fromX, $toX, 4))
+            ->crossJoin(range($fromY, $toY, 4))
+            ->filter(fn (array $xy) => imagecolorat($plain, ...$xy) !== imagecolorat($marked, ...$xy))
+            ->count();
+
+        $this->assertGreaterThan(500, $changedPixels(1500, 1350, 1999, 1499));
+        $this->assertSame(0, $changedPixels(0, 0, 999, 799));
     }
 
     public function test_redoing_images_keeps_the_indexed_status_and_skips_indexing(): void

@@ -25,7 +25,7 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     protected $attributes = [
         'role' => 'photographer',
-        'plan' => 'trial',
+        'plan' => 'studio',
         'is_active' => true,
     ];
 
@@ -58,7 +58,7 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function displayName(): string
     {
-        return $this->business_name ?: $this->name;
+        return $this->name;
     }
 
     public function getFilamentName(): string

@@ -32,6 +32,8 @@ Route::get('media/{photo}/{variant}', MediaController::class)
 
 // Pages invités (accès par le QR code).
 Route::middleware(SetLocale::class)->group(function () {
+    Route::get('evenement', [EventController::class, 'find'])->middleware('throttle:20,1')->name('event.find');
+
     Route::prefix('e/{slug}')->group(function () {
         Route::get('/', [EventController::class, 'show'])->name('event.show');
         Route::post('pin', [EventController::class, 'pin'])->name('event.pin');

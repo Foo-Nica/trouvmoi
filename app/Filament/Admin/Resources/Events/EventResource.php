@@ -30,7 +30,7 @@ class EventResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('title')->label('Événement')->searchable()->description(fn (Event $e) => $e->slug),
-                TextColumn::make('owner.name')->label('Photographe')->searchable(),
+                TextColumn::make('owner.name')->label('Créé par')->searchable(),
                 TextColumn::make('status')->label('Statut')->badge()
                     ->formatStateUsing(fn (EventStatus $state) => $state->label())
                     ->color(fn (EventStatus $state) => $state->color()),

@@ -3,39 +3,63 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/* Police de la charte : Satoshi (fichiers dans public/fonts/satoshi, licence FFL). */
 @font-face {
-    font-family: 'Poppins';
+    font-family: 'Satoshi';
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/satoshi/Satoshi-Light.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Satoshi';
     font-weight: 400;
+    font-style: normal;
     font-display: swap;
-    src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+    src: url('/fonts/satoshi/Satoshi-Regular.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'Poppins';
+    font-family: 'Satoshi';
     font-weight: 500;
+    font-style: normal;
     font-display: swap;
-    src: url('../fonts/Poppins-Medium.ttf') format('truetype');
+    src: url('/fonts/satoshi/Satoshi-Medium.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'Poppins';
-    font-weight: 600;
-    font-display: swap;
-    src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Poppins';
+    font-family: 'Satoshi';
     font-weight: 700;
+    font-style: normal;
     font-display: swap;
-    src: url('../fonts/Poppins-Bold.ttf') format('truetype');
+    src: url('/fonts/satoshi/Satoshi-Bold.woff2') format('woff2');
 }
 
+@font-face {
+    font-family: 'Satoshi';
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/satoshi/Satoshi-Black.woff2') format('woff2');
+}
+
+/*
+ * Charte TRECHART EMPIRE : #333333 et #ED8B00, police Satoshi.
+ * « accent-strong » est une nuance foncée de l'orange réservée aux petits textes sur fond
+ * blanc (l'orange de la charte n'y est pas assez contrasté pour être lu).
+ */
 @theme {
-    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Satoshi', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --color-indigo-brand: #282667;
-    --color-orange-brand: #fe7737;
+    --color-ink: #333333;
+    --color-accent: #ed8b00;
+    --color-accent-strong: #a85f00;
+}
+
+.bg-pattern-white {
+    background-image: url('/images/pattern-white.png');
+    background-size: 48px 24px;
 }
 
 [x-cloak] {

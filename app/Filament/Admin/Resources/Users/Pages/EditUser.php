@@ -10,7 +10,7 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    /** Rôle, forfait et statut ne sont modifiables que depuis le back-office. */
+    /** Rôle, mot de passe et statut ne sont modifiables que depuis le back-office. */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $record->forceFill($data)->save();

@@ -11,7 +11,7 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\Result\ResultInterface;
 use Endroid\QrCode\Writer\SvgWriter;
 
-/** Code QR de la page invités d'un événement, aux couleurs de TrouvMoi. */
+/** Code QR de la page invités d'un événement, aux couleurs de TRECHART EMPIRE. */
 class EventQrCode
 {
     public function make(Event $event, string $format = 'png', int $size = 1200): ResultInterface
@@ -26,7 +26,7 @@ class EventQrCode
             size: $size,
             margin: (int) round($size / 20),
             roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            foregroundColor: new Color(40, 38, 103),
+            foregroundColor: new Color(51, 51, 51),
             backgroundColor: new Color(255, 255, 255),
             logoPath: is_file($logo) ? $logo : '',
             logoResizeToWidth: is_file($logo) ? (int) round($size * 0.2) : null,

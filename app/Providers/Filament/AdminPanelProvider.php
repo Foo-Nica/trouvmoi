@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -17,7 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-/** Back-office de la plateforme : /admin (administrateurs uniquement). */
+/** Back-office TRECHART : /admin (administrateurs uniquement). */
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -25,16 +26,17 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->brandName(config('app.name').' Admin')
-            ->brandLogo(fn () => asset('images/logo-600.png'))
-            ->darkModeBrandLogo(fn () => asset('images/logo-white-600.png'))
+            ->brandName(config('app.name'))
+            ->brandLogo(fn () => asset('images/logo-dark.png'))
+            ->darkModeBrandLogo(fn () => asset('images/logo-white.png'))
             ->brandLogoHeight('2.25rem')
             ->favicon(fn () => asset('favicon.ico'))
             ->login()
             ->colors([
-                'primary' => Color::hex('#FE7737'),
+                'primary' => Color::hex('#ED8B00'),
+                'gray' => Color::Neutral,
             ])
-            ->font('Poppins')
+            ->font('Satoshi', url: fn (): string => asset('fonts/satoshi.css'), provider: LocalFontProvider::class)
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([

@@ -6,6 +6,7 @@ use App\Enums\AccessMode;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Guest\Concerns\ResolvesEvent;
 use App\Models\Download;
+use App\Models\Event;
 use App\Models\Photo;
 use App\Services\Guests\GuestSession;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +24,20 @@ class EventController extends Controller
     use ResolvesEvent;
 
     private const PER_PAGE = 30;
+
+    /** Accès par le code de l'événement (pour qui ne peut pas scanner le QR code). */
+    public function find(Request $request): RedirectResponse
+    {
+        $code = Str::of((string) $request->query('code'))->lower()->replaceMatches('/[^a-z0-9]/', '')->toString();
+
+        if ($code === '' || ! Event::where('slug', $code)->exists()) {
+            return redirect()->route('home')
+                ->withInput(['code' => $request->query('code')])
+                ->withErrors(['code' => __('Aucun événement ne correspond à ce code. Vérifiez-le sous le QR code.')]);
+        }
+
+        return redirect()->route('event.show', $code);
+    }
 
     public function show(string $slug, GuestSession $guests): View
     {

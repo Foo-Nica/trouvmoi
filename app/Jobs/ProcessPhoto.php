@@ -36,11 +36,7 @@ class ProcessPhoto implements ShouldQueue
         $event = $photo->event;
         $disk = Storage::disk(Photo::disk());
 
-        $watermark = $event->watermark_enabled
-            ? $event->owner->displayName().' · '.config('trouvmoi.brand_domain')
-            : null;
-
-        $result = $processor->process($disk->get($photo->original_path), $watermark);
+        $result = $processor->process($disk->get($photo->original_path), $event->watermark_enabled);
 
         $base = "events/{$event->id}";
         $paths = [

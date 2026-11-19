@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -17,7 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-/** Espace des photographes : /studio */
+/** Espace de l'équipe TRECHART : /studio (comptes créés par l'administrateur). */
 class StudioPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -26,21 +27,20 @@ class StudioPanelProvider extends PanelProvider
             ->default()
             ->id('studio')
             ->path('studio')
-            ->brandName(config('app.name').' Studio')
-            ->brandLogo(fn () => asset('images/logo-600.png'))
-            ->darkModeBrandLogo(fn () => asset('images/logo-white-600.png'))
+            ->brandName(config('app.name'))
+            ->brandLogo(fn () => asset('images/logo-dark.png'))
+            ->darkModeBrandLogo(fn () => asset('images/logo-white.png'))
             ->brandLogoHeight('2.25rem')
             ->favicon(fn () => asset('favicon.ico'))
             ->login()
-            ->registration()
             ->passwordReset()
             ->emailVerification()
             ->profile()
             ->colors([
-                'primary' => Color::hex('#282667'),
-                'warning' => Color::hex('#FE7737'),
+                'primary' => Color::hex('#ED8B00'),
+                'gray' => Color::Neutral,
             ])
-            ->font('Poppins')
+            ->font('Satoshi', url: fn (): string => asset('fonts/satoshi.css'), provider: LocalFontProvider::class)
             ->discoverResources(in: app_path('Filament/Studio/Resources'), for: 'App\Filament\Studio\Resources')
             ->discoverPages(in: app_path('Filament/Studio/Pages'), for: 'App\Filament\Studio\Pages')
             ->pages([

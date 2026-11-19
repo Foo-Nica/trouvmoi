@@ -5,8 +5,8 @@
         <input type="hidden" name="search" value="{{ $search }}">
 
         <div class="mb-4">
-            <a href="{{ route('event.show', $event->slug) }}" class="text-sm font-medium text-indigo-brand">← {{ $event->title }}</a>
-            <h1 class="mt-2 text-2xl font-bold text-indigo-brand">
+            <a href="{{ route('event.show', $event->slug) }}" class="text-sm font-medium text-ink">← {{ $event->title }}</a>
+            <h1 class="mt-2 text-2xl font-bold text-ink">
                 @if ($strong->isEmpty() && $maybe->isEmpty())
                     {{ __('Aucune photo trouvée pour l\'instant') }}
                 @else
@@ -25,7 +25,7 @@
         @foreach ([[__('Vos photos'), $strong, true], [__('Peut-être vous'), $maybe, false]] as [$heading, $items, $checked])
             @if ($items->isNotEmpty())
                 <section class="mb-6">
-                    <h2 class="mb-2 flex items-baseline gap-2 font-semibold text-indigo-brand">
+                    <h2 class="mb-2 flex items-baseline gap-2 font-semibold text-ink">
                         {{ $heading }} <span class="text-sm font-normal text-slate-500">({{ $items->count() }})</span>
                     </h2>
                     @unless ($checked)
@@ -36,7 +36,7 @@
                             <label class="group relative block aspect-square cursor-pointer overflow-hidden rounded-lg bg-slate-200">
                                 <input type="checkbox" name="photos[]" value="{{ $item['photo_id'] }}" @checked($checked) class="peer sr-only">
                                 <img src="{{ $item['thumb'] }}" alt="" loading="lazy" class="h-full w-full object-cover transition peer-[:not(:checked)]:opacity-40 peer-[:not(:checked)]:grayscale">
-                                <span class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-black/30 text-white peer-checked:border-orange-brand peer-checked:bg-orange-brand">
+                                <span class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-black/30 text-white peer-checked:border-accent peer-checked:bg-accent peer-checked:text-ink">
                                     <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/></svg>
                                 </span>
                             </label>
@@ -52,7 +52,7 @@
                     <input name="name" maxlength="60" placeholder="{{ __('Nom du dossier (facultatif)') }}"
                            class="hidden min-w-0 flex-1 rounded-xl border border-slate-300 px-3 py-3 text-sm sm:block">
                     <button :disabled="count === 0"
-                            class="flex-1 rounded-xl bg-orange-brand px-5 py-3.5 font-semibold text-white shadow-sm disabled:opacity-40 sm:flex-none">
+                            class="flex-1 rounded-xl bg-accent px-5 py-3.5 font-semibold text-ink shadow-sm disabled:opacity-40 sm:flex-none">
                         {{ __('Créer mon dossier') }} (<span x-text="count">{{ $strong->count() }}</span>)
                     </button>
                 </div>

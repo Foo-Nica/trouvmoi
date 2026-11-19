@@ -2,17 +2,17 @@
 
 namespace App\Services\Images;
 
+use Intervention\Image\Alignment;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
-use Intervention\Image\Typography\FontFactory;
 
 /**
  * Prépare les versions d'une photo : miniature et aperçu (WebP, sans métadonnées EXIF)
- * et version téléchargeable (JPEG), filigranées si demandé.
+ * et version téléchargeable (JPEG), avec le logo en filigrane si demandé.
  *
  * Les photos HEIC nécessitent l'extension Imagick compilée avec libheif.
  */
@@ -28,7 +28,7 @@ class ImageProcessor
     /**
      * @return array{width:int,height:int,thumb:string,preview:string,download:string}
      */
-    public function process(string $bytes, ?string $watermark = null): array
+    public function process(string $bytes, bool $watermark = false): array
     {
         $image = $this->manager->decodeBinary($bytes); // orientation EXIF appliquée automatiquement
         $width = $image->width();
@@ -40,8 +40,8 @@ class ImageProcessor
         $download = (clone $image)->scaleDown(3000, 3000);
 
         if ($watermark) {
-            $this->watermark($preview, $watermark);
-            $this->watermark($download, $watermark);
+            $this->watermark($preview);
+            $this->watermark($download);
         }
 
         return [
@@ -53,24 +53,17 @@ class ImageProcessor
         ];
     }
 
-    /** Texte discret en bas à droite, taille proportionnelle à l'image. */
-    private function watermark(ImageInterface $image, string $text): void
+    /**
+     * Logo TRECHART EMPIRE en bas à droite, large de 20 % de l'image, avec une ombre douce
+     * pour rester lisible sur les fonds clairs comme sombres.
+     */
+    private function watermark(ImageInterface $image): void
     {
-        $size = max(14, (int) round(min($image->width(), $image->height()) * 0.035));
-        $margin = (int) round($size * 0.9);
+        $width = max(120, (int) round($image->width() * 0.2));
+        $margin = (int) round($width * 0.06);
 
-        $shadow = max(1, (int) round($size / 12));
-        $x = $image->width() - $margin;
-        $y = $image->height() - $margin;
+        $logo = $this->manager->decodePath(resource_path('images/watermark.png'))->scale(width: $width);
 
-        // Ombre légère puis texte blanc : lisible sur fond clair comme sombre.
-        foreach ([[$shadow, 'rgba(0, 0, 0, 0.35)'], [0, 'rgba(255, 255, 255, 0.78)']] as [$offset, $color]) {
-            $image->text($text, $x + $offset, $y + $offset, function (FontFactory $font) use ($size, $color) {
-                $font->filename(resource_path('fonts/Poppins-SemiBold.ttf'));
-                $font->size($size);
-                $font->color($color);
-                $font->align('right', 'bottom');
-            });
-        }
+        $image->insert($logo, $margin, $margin, Alignment::BOTTOM_RIGHT, 0.85);
     }
 }

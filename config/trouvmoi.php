@@ -38,12 +38,10 @@ return [
     // Après l'expiration (données faciales déjà supprimées), délai avant la suppression des photos.
     'photos_grace_days' => (int) env('PHOTOS_GRACE_DAYS', 30),
 
-    // Domaine affiché dans le filigrane et sur les affiches QR.
-    'brand_domain' => env('BRAND_DOMAIN', 'trouvmoi.app'),
-
     /*
-    | Forfaits mensuels des photographes. Prix mensuels en FCFA (XOF).
-    | null = illimité.
+    | Limites par compte. Le site est réservé à l'équipe TRECHART : tous les comptes
+    | utilisent « studio » (événements illimités). Les autres paliers restent disponibles
+    | pour limiter un compte précis si besoin. null = illimité.
     */
     'plans' => [
         'trial' => ['label' => 'Essai', 'price_xof' => 0, 'events_per_month' => 1, 'photos_per_event' => 300],
@@ -71,11 +69,11 @@ return [
     | Mentions des pages légales (/confidentialite et /conditions).
     */
     'legal' => [
-        'company' => env('LEGAL_COMPANY', 'Nicanor KSH Solutions'),
-        'address' => env('LEGAL_ADDRESS', 'Abomey-Calavi, Bénin'),
-        'email' => env('LEGAL_EMAIL', 'contact@trouvmoi.app'),
+        'company' => env('LEGAL_COMPANY', 'TRECHART EMPIRE'),
+        'address' => env('LEGAL_ADDRESS', 'Bénin'),
+        'email' => env('LEGAL_EMAIL', 'contact@trechart.com'),
         'apdp_reference' => env('LEGAL_APDP_REFERENCE'),
-        'updated_at' => '2026-11-07',
+        'updated_at' => '2026-11-19',
     ],
 
 ];

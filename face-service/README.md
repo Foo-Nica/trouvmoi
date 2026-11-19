@@ -1,6 +1,6 @@
-# TrouvMoi Face — service de reconnaissance faciale auto-hébergé
+# TRECHART Face - service de reconnaissance faciale auto-hébergé
 
-Service interne appelé par l'application Laravel TrouvMoi. Il détecte les visages de chaque
+Service interne appelé par l'application Laravel TRECHART EMPIRE. Il détecte les visages de chaque
 photo d'un événement, en calcule l'empreinte et retrouve toutes les photos d'une personne à
 partir d'un visage touché dans la galerie ou d'un selfie.
 
@@ -53,4 +53,4 @@ Plusieurs `face_ids` (photos déjà confirmées par l'invité) affinent la reche
 
 Ces valeurs sont des points de départ. Avant le lancement, calibrez-les sur de vraies
 photos d'événement (peaux foncées, éclairage de soirée, flash) avec
-`python scripts/calibrate.py calibration` — le mode d'emploi est en tête du script.
+`python scripts/calibrate.py calibration` : le mode d'emploi est en tête du script.

@@ -1,13 +1,13 @@
 <x-layouts.guest :title="$event->title">
     <div class="space-y-4">
-        <a href="{{ route('event.show', $event->slug) }}" class="inline-flex items-center gap-1 text-sm font-medium text-indigo-brand">
+        <a href="{{ route('event.show', $event->slug) }}" class="inline-flex items-center gap-1 text-sm font-medium text-ink">
             ← {{ __('Retour à la galerie') }}
         </a>
 
         @php($canSearch = $faceSearch && $consented && $faces->isNotEmpty())
 
         @if ($canSearch)
-            <p class="rounded-xl bg-orange-brand/10 px-4 py-3 text-sm font-medium text-indigo-brand">
+            <p class="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-ink">
                 {{ $faces->count() > 1 ? __('Touchez votre visage pour retrouver toutes vos photos.') : __('Touchez le visage pour retrouver toutes les photos de cette personne.') }}
             </p>
         @endif
@@ -21,7 +21,7 @@
                           class="absolute" style="left: {{ $face['left'] }}%; top: {{ $face['top'] }}%; width: {{ $face['width'] }}%; height: {{ $face['height'] }}%;">
                         @csrf
                         <input type="hidden" name="face_id" value="{{ $face['id'] }}">
-                        <button class="h-full w-full rounded-lg border-2 border-white/90 bg-white/5 shadow-[0_0_0_2px_rgba(254,119,55,.9)] transition hover:bg-orange-brand/25 focus:bg-orange-brand/30 focus:outline-none"
+                        <button class="h-full w-full rounded-lg border-2 border-white/90 bg-white/5 shadow-[0_0_0_2px_rgba(254,119,55,.9)] transition hover:bg-accent/25 focus:bg-accent/30 focus:outline-none"
                                 aria-label="{{ __('C\'est moi') }}"></button>
                     </form>
                 @endforeach
@@ -29,8 +29,8 @@
         </div>
 
         @if ($faceSearch && ! $consented)
-            <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 @if (session('needs_consent')) ring-2 ring-orange-brand @endif">
-                <h2 class="mb-3 text-lg font-semibold text-indigo-brand">{{ __('Vous êtes sur cette photo ?') }}</h2>
+            <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 @if (session('needs_consent')) ring-2 ring-accent @endif">
+                <h2 class="mb-3 text-lg font-semibold text-ink">{{ __('Vous êtes sur cette photo ?') }}</h2>
                 @include('guest.partials.consent', ['next' => route('event.photo', [$event->slug, $photo->id], false)])
             </section>
         @elseif ($faceSearch && $faces->isEmpty())
@@ -39,7 +39,7 @@
 
         @if ($photo->download_path)
             <a href="{{ route('event.download', [$event->slug, $photo->id]) }}"
-               class="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-indigo-brand shadow-sm ring-1 ring-slate-300">
+               class="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-ink shadow-sm ring-1 ring-slate-300">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>
                 {{ __('Télécharger cette photo') }}
             </a>

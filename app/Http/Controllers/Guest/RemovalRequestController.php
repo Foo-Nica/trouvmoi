@@ -34,6 +34,6 @@ class RemovalRequestController extends Controller
             $event->owner->notify(new RemovalRequested($removalRequest));
         }
 
-        return back()->with('status', __('Demande envoyée. Le photographe retirera la photo sous 72 h.'));
+        return back()->with('status', __('Demande envoyée. L\'équipe TRECHART retirera la photo sous 72 h.'));
     }
 }

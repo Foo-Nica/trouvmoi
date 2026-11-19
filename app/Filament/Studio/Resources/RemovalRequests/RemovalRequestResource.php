@@ -61,8 +61,8 @@ class RemovalRequestResource extends Resource
                     ->getStateUsing(fn (RemovalRequest $r) => $r->photo?->temporaryUrl('thumb'))
                     ->imageHeight(56),
                 TextColumn::make('event.title')->label('Événement')->limit(30),
-                TextColumn::make('reason')->label('Motif')->placeholder('—')->wrap()->limit(80),
-                TextColumn::make('contact')->label('Contact')->placeholder('—'),
+                TextColumn::make('reason')->label('Motif')->placeholder('-')->wrap()->limit(80),
+                TextColumn::make('contact')->label('Contact')->placeholder('-'),
                 TextColumn::make('status')->label('Statut')->badge()
                     ->formatStateUsing(fn (string $state) => ['pending' => 'À traiter', 'done' => 'Photo retirée', 'rejected' => 'Refusée'][$state] ?? $state)
                     ->color(fn (string $state) => ['pending' => 'danger', 'done' => 'success', 'rejected' => 'gray'][$state] ?? 'gray'),

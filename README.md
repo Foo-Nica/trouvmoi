@@ -1,16 +1,23 @@
-# TrouvMoi
+# TRECHART EMPIRE - livraison des photos d'événements
 
-Plateforme de photos d'événements : les photographes publient leurs photos traitées, chaque
-invité scanne un code QR, montre son visage une fois et retrouve toutes les photos où il
-apparaît grâce à la reconnaissance faciale, dans un dossier à télécharger.
+Site de TRECHART EMPIRE, studio créatif et de production visuelle : l'équipe publie les photos
+traitées de chaque événement couvert, chaque invité scanne un code QR (ou saisit le code de
+l'événement sur la page d'accueil), montre son visage une fois et retrouve toutes les photos où
+il apparaît grâce à la reconnaissance faciale, dans un dossier à télécharger. Les photos portent
+le logo TRECHART en filigrane.
 
-Le cahier des charges complet est la référence fonctionnelle de ce dépôt.
+Le site est réservé à la marque : pas d'inscription publique, les comptes de l'équipe sont créés
+par l'administrateur dans `/admin` (menu « Équipe »).
+
+La charte graphique (logo, couleurs #333333 et #ED8B00, police Satoshi) est appliquée au site,
+aux espaces `/studio` et `/admin`, au code QR et au filigrane. Les fichiers du logo sont dans
+`public/images/`, le filigrane dans `resources/images/watermark.png`.
 
 ## Architecture
 
 | Partie | Technologie | Dossier |
 | --- | --- | --- |
-| Application web, espace photographe, back-office | Laravel 13, Filament 5, Livewire, Tailwind 4 | racine |
+| Application web, espace équipe, back-office | Laravel 13, Filament 5, Livewire, Tailwind 4 | racine |
 | Files d'attente (traitement, indexation) | Redis + Laravel Horizon | `app/Jobs` |
 | Stockage des photos | Disque local (dev), Cloudflare R2 ou S3 (prod) | `config/filesystems.php` |
 | Reconnaissance faciale **auto-hébergée** | Python, FastAPI, OpenCV (YuNet MIT + SFace Apache 2.0) | `face-service/` |
@@ -57,7 +64,7 @@ Ouvrez <http://127.0.0.1:8000>. Comptes de démonstration (mot de passe : `passw
 
 | Compte | Accès |
 | --- | --- |
-| `photo@trouvmoi.test` | Espace photographe `/studio` |
+| `photo@trouvmoi.test` | Espace équipe `/studio` |
 | `admin@trouvmoi.test` | Back-office `/admin` (et `/horizon` en production) |
 
 Les e-mails (vérification d'adresse, demandes de retrait) sont écrits dans `storage/logs/laravel.log`
@@ -92,7 +99,8 @@ Sans ce service, l'envoi et l'affichage des photos fonctionnent, mais les photos
 
 ### Adresses utiles
 
-- Espace photographe : `/studio` · back-office : `/admin`
+- Espace équipe : `/studio` · back-office : `/admin`
+- Accès invités par code : page d'accueil, champ « Code de l'événement » (code affiché dans `/studio`, colonne « Code invités »)
 - Page invités d'un événement : `/e/{code}` (adresse contenue dans le QR code)
 - Dossier personnel d'un invité : `/d/{lien privé}`
 - Pages légales : `/confidentialite` et `/conditions` (mentions dans `.env` : `LEGAL_*`)

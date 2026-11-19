@@ -4,8 +4,8 @@
              alt="" class="h-40 w-full object-cover sm:h-56">
     @endif
     <div class="p-5">
-        <p class="text-xs font-semibold uppercase tracking-wide text-orange-brand">{{ $event->owner->displayName() }}</p>
-        <h1 class="mt-1 text-2xl font-bold leading-tight text-indigo-brand">{{ $event->title }}</h1>
+        <p class="text-xs font-semibold uppercase tracking-wide text-accent-strong">{{ config('app.name') }}</p>
+        <h1 class="mt-1 text-2xl font-bold leading-tight text-ink">{{ $event->title }}</h1>
         @php($meta = collect([$event->event_date?->translatedFormat('j F Y'), $event->location])->filter()->join(' · '))
         @if ($meta)
             <p class="mt-1 text-sm text-slate-500">{{ $meta }}</p>

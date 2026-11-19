@@ -29,6 +29,13 @@ class EventsTable
                     ->searchable()
                     ->weight('semibold')
                     ->description(fn (Event $record) => collect([$record->event_date?->format('d/m/Y'), $record->location])->filter()->join(' · ')),
+                TextColumn::make('slug')
+                    ->label('Code invités')
+                    ->formatStateUsing(fn (string $state): string => strtoupper($state))
+                    ->fontFamily('mono')
+                    ->copyable()
+                    ->copyableState(fn (Event $record): string => strtoupper($record->slug))
+                    ->tooltip('À communiquer aux invités : ils peuvent le saisir sur la page d\'accueil.'),
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
