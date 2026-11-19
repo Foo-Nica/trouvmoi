@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\AccessMode;
 use App\Enums\EventStatus;
+use App\Enums\EventType;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,6 +25,17 @@ class EventFactory extends Factory
             'has_minors' => false,
             'retention_days' => 60,
         ];
+    }
+
+    /** Prestation pour une personnalité : téléchargements payants. */
+    public function client(int $originalPrice = 2000, ?int $packPrice = null): static
+    {
+        return $this->state(fn () => [
+            'type' => EventType::Client,
+            'client_name' => fake()->name(),
+            'original_price' => $originalPrice,
+            'pack_price' => $packPrice,
+        ]);
     }
 
     public function draft(): static

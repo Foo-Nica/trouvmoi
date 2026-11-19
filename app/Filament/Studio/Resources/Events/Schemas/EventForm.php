@@ -4,6 +4,7 @@ namespace App\Filament\Studio\Resources\Events\Schemas;
 
 use App\Enums\AccessMode;
 use App\Enums\EventStatus;
+use App\Enums\EventType;
 use App\Models\Photo;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -57,6 +58,47 @@ class EventForm
                             ->columnSpanFull(),
                     ]),
 
+                Section::make('Type de prestation et tarifs')
+                    ->description('Les prix sont en FCFA et sont encaissés par le moyen de paiement du site (KKiaPay ou FedaPay).')
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        Radio::make('type')
+                            ->label('Type')
+                            ->options(EventType::options())
+                            ->descriptions(collect(EventType::cases())->mapWithKeys(fn (EventType $t) => [$t->value => $t->description()])->all())
+                            ->default(EventType::Public->value)
+                            ->live()
+                            ->required()
+                            ->columnSpanFull(),
+                        TextInput::make('client_name')
+                            ->label('Nom de la personnalité')
+                            ->placeholder('Mme Awa Mensah')
+                            ->maxLength(150)
+                            ->required(fn (Get $get) => $get('type') === EventType::Client->value)
+                            ->visible(fn (Get $get) => $get('type') === EventType::Client->value)
+                            ->columnSpanFull(),
+                        TextInput::make('original_price')
+                            ->label(fn (Get $get) => $get('type') === EventType::Client->value ? 'Prix par photo' : 'Prix de la version originale (par photo)')
+                            ->helperText(fn (Get $get) => $get('type') === EventType::Client->value
+                                ? 'Laisser vide ou 0 : les originaux se téléchargent sans payer.'
+                                : 'Laisser vide : pas de vente, seulement le téléchargement gratuit avec logo.')
+                            ->numeric()
+                            ->integer()
+                            ->minValue(0)
+                            ->maxValue(10_000_000)
+                            ->suffix('FCFA'),
+                        TextInput::make('pack_price')
+                            ->label('Prix de toutes les photos (forfait)')
+                            ->helperText('Facultatif : la personnalité achète toutes ses photos en une fois.')
+                            ->numeric()
+                            ->integer()
+                            ->minValue(0)
+                            ->maxValue(100_000_000)
+                            ->suffix('FCFA')
+                            ->visible(fn (Get $get) => $get('type') === EventType::Client->value),
+                    ]),
+
                 Section::make('Accès des invités')
                     ->columnSpanFull()
                     ->schema([
@@ -90,8 +132,9 @@ class EventForm
                     ->columns(3)
                     ->schema([
                         Toggle::make('watermark_enabled')
-                            ->label('Filigrane sur les photos')
-                            ->helperText('Votre nom sur les aperçus et les téléchargements.')
+                            ->label('Logo TRECHART en filigrane')
+                            ->helperText('Sur les aperçus et les téléchargements gratuits. Toujours présent pour une personnalité.')
+                            ->visible(fn (Get $get) => $get('type') !== EventType::Client->value)
                             ->default(true),
                         Select::make('retention_days')
                             ->label('Conservation après l\'événement')

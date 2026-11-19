@@ -26,19 +26,28 @@
             </ul>
         </x-legal-section>
 
-        <x-legal-section title="4. Propriété intellectuelle">
+        <x-legal-section title="4. Achat des photos">
+            <ul>
+                <li>Pour un événement public, chaque photo peut être téléchargée gratuitement avec le logo TRECHART. La version originale, sans filigrane, est payante lorsqu'un prix est affiché.</li>
+                <li>Pour une séance réalisée pour une personnalité, les photos se téléchargent après paiement, à l'unité ou en forfait, aux prix affichés.</li>
+                <li>Les prix sont indiqués en francs CFA (FCFA), toutes taxes comprises. Le paiement est traité par KKiaPay ou FedaPay (Mobile Money, carte bancaire) : {{ $legal['company'] }} ne reçoit jamais vos données de carte.</li>
+                <li>Les photos achetées sont livrées dès la confirmation du paiement, par un lien privé permettant de les retélécharger pendant la durée de conservation de l'événement.</li>
+            </ul>
+        </x-legal-section>
+
+        <x-legal-section title="5. Propriété intellectuelle">
             <p>Les photos et le logo restent la propriété de {{ $legal['company'] }}. Les invités peuvent télécharger et partager les photos où ils apparaissent pour un usage personnel, sans retirer le filigrane.</p>
         </x-legal-section>
 
-        <x-legal-section title="5. Responsabilité">
+        <x-legal-section title="6. Responsabilité">
             <p>La reconnaissance faciale peut produire des erreurs : l'invité vérifie les photos proposées avant de créer son dossier. {{ $legal['company'] }} met en œuvre les moyens raisonnables pour assurer la disponibilité et la sécurité du service, sans garantir une disponibilité ininterrompue.</p>
         </x-legal-section>
 
-        <x-legal-section title="6. Accès au service">
+        <x-legal-section title="7. Accès au service">
             <p>L'accès à un événement ou à un dossier peut être retiré en cas d'usage abusif, notamment en cas de recherche des photos d'une autre personne sans son accord.</p>
         </x-legal-section>
 
-        <x-legal-section title="7. Droit applicable">
+        <x-legal-section title="8. Droit applicable">
             <p>Les présentes conditions sont soumises au droit béninois. Contact : <a class="text-accent-strong underline" href="mailto:{{ $legal['email'] }}">{{ $legal['email'] }}</a>.</p>
         </x-legal-section>
     </article>

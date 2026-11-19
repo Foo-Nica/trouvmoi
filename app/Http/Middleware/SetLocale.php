@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/** Langue des pages invités : ?lang=…, puis la session, puis la langue du téléphone. */
+/** Langue des pages invités : ?lang=…, puis la session ; le français par défaut. */
 class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
@@ -17,9 +17,7 @@ class SetLocale
             $request->session()->put('locale', $lang);
         }
 
-        $locale = $request->session()->get('locale')
-            ?? $request->getPreferredLanguage($supported)
-            ?? config('app.locale');
+        $locale = $request->session()->get('locale', config('app.locale'));
 
         app()->setLocale(in_array($locale, $supported, true) ? $locale : config('app.locale'));
 

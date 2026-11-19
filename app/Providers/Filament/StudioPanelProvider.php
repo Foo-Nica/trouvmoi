@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -32,6 +33,7 @@ class StudioPanelProvider extends PanelProvider
             ->darkModeBrandLogo(fn () => asset('images/logo-white.png'))
             ->brandLogoHeight('2.25rem')
             ->favicon(fn () => asset('favicon.ico'))
+            ->defaultAvatarProvider(InitialsAvatarProvider::class)
             ->login()
             ->passwordReset()
             ->emailVerification()

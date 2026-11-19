@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\AccessMode;
 use App\Enums\EventStatus;
+use App\Enums\EventType;
+use App\Enums\OrderStatus;
 use App\Jobs\DeleteEventFiles;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -19,8 +21,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 #[Fillable([
-    'user_id', 'title', 'event_date', 'location', 'description', 'cover_path', 'access_mode', 'status',
-    'watermark_enabled', 'has_minors', 'retention_days',
+    'user_id', 'title', 'type', 'client_name', 'event_date', 'location', 'description', 'cover_path', 'access_mode', 'status',
+    'watermark_enabled', 'original_price', 'pack_price', 'has_minors', 'retention_days',
 ])]
 #[Hidden(['pin_hash'])]
 class Event extends Model
@@ -29,6 +31,7 @@ class Event extends Model
     use HasFactory, HasUlids;
 
     protected $attributes = [
+        'type' => 'public',
         'access_mode' => 'gallery',
         'status' => 'draft',
         'watermark_enabled' => true,
@@ -43,7 +46,10 @@ class Event extends Model
     {
         return [
             'event_date' => 'date',
+            'type' => EventType::class,
             'access_mode' => AccessMode::class,
+            'original_price' => 'integer',
+            'pack_price' => 'integer',
             'status' => EventStatus::class,
             'watermark_enabled' => 'boolean',
             'has_minors' => 'boolean',
@@ -120,6 +126,57 @@ class Event extends Model
     public function removalRequests(): HasMany
     {
         return $this->hasMany(RemovalRequest::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function paidOrders(): HasMany
+    {
+        return $this->hasMany(Order::class)->where('status', OrderStatus::Paid);
+    }
+
+    public function isClient(): bool
+    {
+        return $this->type === EventType::Client;
+    }
+
+    /** Événement public : la version avec logo se télécharge gratuitement. */
+    public function allowsFreeDownload(): bool
+    {
+        return ! $this->isClient();
+    }
+
+    /** Les aperçus d'un événement « personnalité » portent toujours le logo. */
+    public function watermarksPreviews(): bool
+    {
+        return $this->watermark_enabled || $this->isClient();
+    }
+
+    /** Prix de la version originale d'une photo (FCFA) : celui de la photo, sinon celui de l'événement. */
+    public function priceFor(Photo $photo): int
+    {
+        return (int) ($photo->price ?? $this->original_price ?? 0);
+    }
+
+    /** La version originale d'une photo est-elle disponible (payante ou offerte) ? */
+    public function offersOriginal(Photo $photo): bool
+    {
+        return $this->isClient() || $this->priceFor($photo) > 0;
+    }
+
+    /** Prix de toutes les photos en une fois (personnalité), null si non proposé. */
+    public function packOffer(): ?int
+    {
+        return $this->isClient() && $this->pack_price > 0 ? $this->pack_price : null;
+    }
+
+    /** Total encaissé pour l'événement (commandes payées). */
+    public function revenue(): int
+    {
+        return (int) $this->orders()->where('status', OrderStatus::Paid)->sum('amount');
     }
 
     /** Événements que l'utilisateur possède ou sur lesquels il est membre. */

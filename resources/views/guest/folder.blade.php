@@ -17,11 +17,11 @@
         @endif
 
         <div class="mt-4 grid gap-2 sm:grid-cols-3" x-data="share(@js($folder->privateUrl()), @js(__('Mes photos de :event', ['event' => $event->title])))">
-            @if ($photos->isNotEmpty())
+            @if ($photos->isNotEmpty() && $event->allowsFreeDownload())
                 <a href="{{ route('folder.zip', $folder->access_token) }}"
                    class="flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 font-semibold text-ink shadow-sm">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>
-                    {{ __('Tout télécharger') }}
+                    {{ $event->watermark_enabled ? __('Tout télécharger (avec logo)') : __('Tout télécharger') }}
                 </a>
             @endif
             <a href="https://wa.me/?text={{ rawurlencode(__('Mes photos de :event', ['event' => $event->title]).' : '.$folder->privateUrl()) }}"
@@ -35,6 +35,18 @@
                 <span x-show="copied" x-cloak>{{ __('Lien copié !') }}</span>
             </button>
         </div>
+
+        @php($toBuy = $photos->filter(fn ($photo) => $event->priceFor($photo) > 0 && ! $purchased->owns($photo)))
+        @if ($toBuy->isNotEmpty())
+            <a href="{{ route('order.checkout', [$event->slug, 'folder' => $folder->access_token]) }}"
+               class="mt-3 flex items-center justify-between gap-3 rounded-xl bg-ink px-4 py-3.5 text-white shadow-sm">
+                <span>
+                    <span class="block font-semibold">{{ __('Acheter les originaux') }}</span>
+                    <span class="block text-xs text-white/70">{{ trans_choice(':count photo, pleine qualité, sans filigrane|:count photos, pleine qualité, sans filigrane', $toBuy->count()) }}</span>
+                </span>
+                <span class="font-bold text-accent">{{ \App\Models\Order::formatPrice($toBuy->sum(fn ($photo) => $event->priceFor($photo))) }}</span>
+            </a>
+        @endif
     </div>
 
     @if ($photos->isEmpty())
@@ -48,8 +60,18 @@
                     <img src="{{ $photo->temporaryUrl('thumb', 120) }}" alt="" loading="lazy" class="h-full w-full object-cover">
                 </a>
                 <figcaption class="flex items-center justify-between gap-1 px-2 py-1.5">
-                    <a href="{{ route('folder.download', [$folder->access_token, $photo->id]) }}"
-                       class="rounded-md px-2 py-1 text-sm font-medium text-ink hover:bg-slate-100">{{ __('Télécharger') }}</a>
+                    @if ($bought = $purchased->orderFor($photo))
+                        <a href="{{ route('order.download', [$bought->access_token, $photo->id]) }}"
+                           class="rounded-md px-2 py-1 text-sm font-semibold text-accent-strong hover:bg-slate-100">{{ __('Original') }}</a>
+                    @elseif ($event->allowsFreeDownload())
+                        <a href="{{ route('folder.download', [$folder->access_token, $photo->id]) }}"
+                           class="rounded-md px-2 py-1 text-sm font-medium text-ink hover:bg-slate-100">{{ __('Télécharger') }}</a>
+                    @elseif ($event->priceFor($photo) === 0)
+                        <a href="{{ route('event.original', [$event->slug, $photo->id]) }}"
+                           class="rounded-md px-2 py-1 text-sm font-medium text-ink hover:bg-slate-100">{{ __('Télécharger') }}</a>
+                    @else
+                        <span class="px-2 py-1 text-xs font-semibold text-slate-500">{{ \App\Models\Order::formatPrice($event->priceFor($photo)) }}</span>
+                    @endif
                     @if ($isOwner)
                         <form method="POST" action="{{ route('folder.exclude', [$folder->access_token, $photo->id]) }}">
                             @csrf

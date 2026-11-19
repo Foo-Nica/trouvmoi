@@ -9,6 +9,7 @@ use App\Models\Folder;
 use App\Models\Photo;
 use App\Services\Folders\FolderRefresher;
 use App\Services\Guests\GuestSession;
+use App\Services\Orders\OrderPayments;
 use App\Services\Search\SearchResults;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class FolderController extends Controller
         return redirect()->route('folder.show', $folder->access_token)->with('created', true);
     }
 
-    public function show(string $token, FolderRefresher $refresher): View
+    public function show(string $token, FolderRefresher $refresher, OrderPayments $orders): View
     {
         $folder = $this->folder($token);
 
@@ -87,6 +88,7 @@ class FolderController extends Controller
             'photos' => $photos,
             'isOwner' => $this->isOwner($folder),
             'added' => $added,
+            'purchased' => $orders->purchasedPhotoIds($folder->event, $this->guests->current()),
         ]);
     }
 
@@ -115,6 +117,7 @@ class FolderController extends Controller
     {
         $folder = $this->folder($token);
         abort_if($folder->event->isExpired(), 410);
+        abort_unless($folder->event->allowsFreeDownload(), 404);
         $photo = $folder->keptPhotos()->whereNotNull('download_path')->findOrFail($photoId);
 
         $this->logDownload($folder, 'photo', 1);
@@ -126,11 +129,12 @@ class FolderController extends Controller
     {
         $folder = $this->folder($token);
         abort_if($folder->event->isExpired(), 410);
+        abort_unless($folder->event->allowsFreeDownload(), 404);
         $photos = $folder->keptPhotos()->whereNotNull('download_path')->get();
         abort_if($photos->isEmpty(), 404);
 
         $this->logDownload($folder, 'zip', $photos->count());
-        $name = Str::slug($folder->event->title).'-trouvmoi.zip';
+        $name = Str::slug($folder->event->title).'-trechart.zip';
 
         return response()->streamDownload(function () use ($folder, $photos) {
             // Les JPEG sont déjà compressés : on les range sans recompresser (plus rapide).

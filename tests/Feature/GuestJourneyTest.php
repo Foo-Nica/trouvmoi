@@ -299,6 +299,15 @@ class GuestJourneyTest extends TestCase
         Notification::assertSentToTimes($this->event->owner, RemovalRequested::class, 1);
     }
 
+    public function test_site_is_in_french_by_default_whatever_the_phone_language(): void
+    {
+        $this->withHeader('Accept-Language', 'en-US,en;q=0.9')
+            ->get(route('event.show', $this->event->slug))
+            ->assertOk()
+            ->assertSee('Toutes les photos')
+            ->assertSeeInOrder(['<select', 'Français', 'English', 'Español', 'Deutsch', '</select>'], false);
+    }
+
     public function test_language_switch(): void
     {
         $this->get(route('event.show', [$this->event->slug, 'lang' => 'en']))->assertOk()->assertSee('Before you start');

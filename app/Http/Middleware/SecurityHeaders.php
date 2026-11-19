@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SecurityHeaders
 {
-    private const PRIVATE_PATHS = ['e/*', 'd/*', 'media/*'];
+    private const PRIVATE_PATHS = ['e/*', 'd/*', 'media/*', 'commande/*'];
 
     public function handle(Request $request, Closure $next): Response
     {

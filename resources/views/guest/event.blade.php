@@ -2,6 +2,7 @@
     <div class="grid gap-5 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start">
         <div class="space-y-5 lg:sticky lg:top-20">
             @include('guest.partials.event-header', ['showDescription' => true])
+            @include('guest.partials.offer')
 
             @if ($faceSearch)
                 <section id="rechercher" class="scroll-mt-20 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
@@ -71,4 +72,6 @@
             </section>
         @endif
     </div>
+
+    @include('guest.partials.cart-bar')
 </x-layouts.guest>

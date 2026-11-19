@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->redirectGuestsTo(fn () => route('filament.studio.auth.login'));
         $middleware->appendToGroup('web', SecurityHeaders::class);
+        $middleware->validateCsrfTokens(except: ['paiement/webhook/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -8,21 +8,24 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /** Comptes de démonstration (mot de passe : password). À ne pas lancer en production. */
+    /** Comptes et contenus de démonstration (mot de passe : password). À ne pas lancer en production. */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Administrateur',
-            'email' => 'admin@trouvmoi.test',
+        $admin = User::factory()->create([
+            'name' => 'Direction TRECHART',
+            'email' => 'admin@trechart.test',
             'role' => UserRole::Admin,
             'business_name' => null,
+            'plan' => 'studio',
         ]);
 
         User::factory()->create([
-            'name' => 'Photographe Démo',
-            'email' => 'photo@trouvmoi.test',
-            'business_name' => 'Studio Lumière',
-            'plan' => 'pro',
+            'name' => 'Équipe TRECHART',
+            'email' => 'equipe@trechart.test',
+            'business_name' => null,
+            'plan' => 'studio',
         ]);
+
+        $this->callWith(DemoSeeder::class, ['owner' => $admin]);
     }
 }

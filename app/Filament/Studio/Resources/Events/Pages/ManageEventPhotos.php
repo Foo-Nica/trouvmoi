@@ -12,6 +12,7 @@ use App\Services\Photos\PhotoRemover;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRelatedRecords;
 use Filament\Schemas\Components\EmbeddedTable;
@@ -20,6 +21,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\TextInputColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -110,6 +112,13 @@ class ManageEventPhotos extends ManageRelatedRecords
                     ->tooltip(fn (Photo $record) => $record->error),
                 TextColumn::make('faces_count')->label('Visages')->numeric()->alignEnd(),
                 ToggleColumn::make('is_visible')->label('Visible'),
+                TextInputColumn::make('price')
+                    ->label('Prix (FCFA)')
+                    ->type('number')
+                    ->rules(['nullable', 'integer', 'min:0', 'max:10000000'])
+                    ->placeholder(fn () => $this->getRecord()->original_price ? (string) $this->getRecord()->original_price : 'Prix de l\'événement')
+                    ->tooltip('Laisser vide pour appliquer le prix de l\'événement.')
+                    ->width('9rem'),
                 TextColumn::make('created_at')->label('Envoyée')->since()->toggleable(),
             ])
             ->filters([
@@ -135,6 +144,19 @@ class ManageEventPhotos extends ManageRelatedRecords
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('price')
+                        ->label('Définir le prix')
+                        ->icon(Heroicon::OutlinedBanknotes)
+                        ->schema([
+                            TextInput::make('price')
+                                ->label('Prix de la version originale')
+                                ->helperText('Laisser vide pour revenir au prix de l\'événement.')
+                                ->numeric()->integer()->minValue(0)->suffix('FCFA'),
+                        ])
+                        ->action(function (Collection $records, array $data) {
+                            Photo::whereKey($records->modelKeys())->update(['price' => filled($data['price']) ? (int) $data['price'] : null]);
+                            Notification::make()->title('Prix mis à jour')->success()->send();
+                        }),
                     BulkAction::make('hide')
                         ->label('Masquer')
                         ->icon(Heroicon::OutlinedEyeSlash)

@@ -11,8 +11,9 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
 
 /**
- * Prépare les versions d'une photo : miniature et aperçu (WebP, sans métadonnées EXIF)
- * et version téléchargeable (JPEG), avec le logo en filigrane si demandé.
+ * Prépare les versions d'une photo, toutes sans métadonnées EXIF :
+ * - miniature et aperçu (WebP) et version téléchargeable (JPEG), avec le logo en filigrane si demandé ;
+ * - version originale (JPEG pleine qualité) vendue aux invités, avec un logo minuscule et discret.
  *
  * Les photos HEIC nécessitent l'extension Imagick compilée avec libheif.
  */
@@ -26,7 +27,7 @@ class ImageProcessor
     }
 
     /**
-     * @return array{width:int,height:int,thumb:string,preview:string,download:string}
+     * @return array{width:int,height:int,thumb:string,preview:string,download:string,hd:string}
      */
     public function process(string $bytes, bool $watermark = false): array
     {
@@ -38,6 +39,8 @@ class ImageProcessor
         $thumb = (clone $image)->scaleDown($config['thumb_size'], $config['thumb_size']);
         $preview = (clone $image)->scaleDown($config['preview_size'], $config['preview_size']);
         $download = (clone $image)->scaleDown(3000, 3000);
+        $hd = (clone $image)->scaleDown(5000, 5000);
+        $this->signature($hd);
 
         if ($watermark) {
             $this->watermark($preview);
@@ -50,6 +53,7 @@ class ImageProcessor
             'thumb' => $thumb->encode(new WebpEncoder($config['webp_quality'], strip: true))->toString(),
             'preview' => $preview->encode(new WebpEncoder($config['webp_quality'], strip: true))->toString(),
             'download' => $download->encode(new JpegEncoder(88, progressive: true, strip: true))->toString(),
+            'hd' => $hd->encode(new JpegEncoder(94, progressive: true, strip: true))->toString(),
         ];
     }
 
@@ -59,11 +63,20 @@ class ImageProcessor
      */
     private function watermark(ImageInterface $image): void
     {
-        $width = max(120, (int) round($image->width() * 0.2));
-        $margin = (int) round($width * 0.06);
+        $this->insertLogo($image, max(120, (int) round($image->width() * 0.2)), 0.85);
+    }
 
+    /** Version originale : logo minuscule (6 % de la largeur), presque transparent. */
+    private function signature(ImageInterface $image): void
+    {
+        $this->insertLogo($image, max(70, (int) round($image->width() * 0.06)), 0.55);
+    }
+
+    private function insertLogo(ImageInterface $image, int $width, float $opacity): void
+    {
+        $margin = (int) round($width * 0.08);
         $logo = $this->manager->decodePath(resource_path('images/watermark.png'))->scale(width: $width);
 
-        $image->insert($logo, $margin, $margin, Alignment::BOTTOM_RIGHT, 0.85);
+        $image->insert($logo, $margin, $margin, Alignment::BOTTOM_RIGHT, $opacity);
     }
 }

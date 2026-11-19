@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-/** Prévient le photographe qu'un invité demande le retrait d'une photo (à traiter sous 72 h). */
+/** Prévient l'équipe qu'un invité demande le retrait d'une photo (à traiter sous 72 h). */
 class RemovalRequested extends Notification implements ShouldQueue
 {
     use Queueable;

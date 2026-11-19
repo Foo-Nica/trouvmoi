@@ -12,8 +12,8 @@ use Illuminate\Support\Str;
 use Throwable;
 
 /**
- * Miniature, aperçu et version téléchargeable, puis indexation des visages.
- * Avec $indexFaces à false (changement de filigrane), seules les images sont refaites.
+ * Miniature, aperçu, version téléchargeable et version originale, puis indexation des visages.
+ * Avec $indexFaces à false (changement de filigrane ou de type), seules les images sont refaites.
  */
 class ProcessPhoto implements ShouldQueue
 {
@@ -36,17 +36,19 @@ class ProcessPhoto implements ShouldQueue
         $event = $photo->event;
         $disk = Storage::disk(Photo::disk());
 
-        $result = $processor->process($disk->get($photo->original_path), $event->watermark_enabled);
+        $result = $processor->process($disk->get($photo->original_path), $event->watermarksPreviews());
 
         $base = "events/{$event->id}";
         $paths = [
             'thumb_path' => "{$base}/thumbs/{$photo->id}.webp",
             'preview_path' => "{$base}/previews/{$photo->id}.webp",
             'download_path' => "{$base}/downloads/{$photo->id}.jpg",
+            'hd_path' => "{$base}/originals-hd/{$photo->id}.jpg",
         ];
         $disk->put($paths['thumb_path'], $result['thumb']);
         $disk->put($paths['preview_path'], $result['preview']);
         $disk->put($paths['download_path'], $result['download']);
+        $disk->put($paths['hd_path'], $result['hd']);
 
         $photo->update($paths + [
             'width' => $result['width'],

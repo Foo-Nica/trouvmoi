@@ -35,6 +35,9 @@ return [
 
     'default_retention_days' => 60,
 
+    // Hébergement mutualisé : la file d'attente est traitée par la tâche cron (voir routes/console.php).
+    'queue_from_scheduler' => (bool) env('QUEUE_FROM_SCHEDULER', false),
+
     // Après l'expiration (données faciales déjà supprimées), délai avant la suppression des photos.
     'photos_grace_days' => (int) env('PHOTOS_GRACE_DAYS', 30),
 
@@ -48,6 +51,36 @@ return [
         'starter' => ['label' => 'Starter', 'price_xof' => 2000, 'events_per_month' => 4, 'photos_per_event' => 3000],
         'pro' => ['label' => 'Pro', 'price_xof' => 5000, 'events_per_month' => 15, 'photos_per_event' => 15000],
         'studio' => ['label' => 'Studio', 'price_xof' => 15000, 'events_per_month' => null, 'photos_per_event' => 50000],
+    ],
+
+    /*
+    | Paiement des photos (versions originales, personnalités).
+    | driver : « kkiapay », « fedapay » ou « fake » (démonstration locale : aucun débit réel).
+    */
+    'payments' => [
+        'driver' => env('PAYMENT_DRIVER', 'fake'),
+        'currency' => 'XOF',
+
+        'kkiapay' => [
+            'public_key' => env('KKIAPAY_PUBLIC_KEY'),
+            'private_key' => env('KKIAPAY_PRIVATE_KEY'),
+            'secret' => env('KKIAPAY_SECRET'),
+            'sandbox' => (bool) env('KKIAPAY_SANDBOX', true),
+            // Valeur saisie dans le tableau de bord KKiaPay pour signer le webhook (en-tête x-kkiapay-secret).
+            'webhook_secret' => env('KKIAPAY_WEBHOOK_SECRET'),
+            'api_url' => env('KKIAPAY_API_URL', 'https://api.kkiapay.me'),
+            'sandbox_api_url' => env('KKIAPAY_SANDBOX_API_URL', 'https://api-sandbox.kkiapay.me'),
+            'widget_url' => 'https://cdn.kkiapay.me/k.js',
+        ],
+
+        'fedapay' => [
+            'secret_key' => env('FEDAPAY_SECRET_KEY'),
+            'environment' => env('FEDAPAY_ENVIRONMENT', 'sandbox'), // sandbox | live
+            'webhook_secret' => env('FEDAPAY_WEBHOOK_SECRET'),
+            'api_url' => 'https://api.fedapay.com/v1',
+            'sandbox_api_url' => 'https://sandbox-api.fedapay.com/v1',
+            'country' => env('FEDAPAY_COUNTRY', 'bj'),
+        ],
     ],
 
     'locales' => [

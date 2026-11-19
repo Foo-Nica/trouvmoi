@@ -20,6 +20,7 @@
                 <li><strong>Photos des événements</strong> envoyées par l'équipe. Les métadonnées (dont la localisation GPS) sont retirées des versions affichées et téléchargées.</li>
                 <li><strong>Empreintes faciales</strong> : pour chaque visage détecté sur les photos d'un événement, une suite de nombres qui permet de comparer des visages. Ce n'est pas une image et elle ne permet pas de reconstituer le visage.</li>
                 <li><strong>Invités</strong> : aucun compte n'est demandé. Un identifiant aléatoire est enregistré dans un cookie pour retrouver vos dossiers. Nous conservons la preuve de votre consentement (date, version de la notice, empreinte non réversible de votre adresse IP).</li>
+                <li><strong>Achats</strong> : nom, téléphone, e-mail facultatif, photos achetées, montant et référence de la transaction. Le paiement est traité par KKiaPay ou FedaPay : aucune donnée de carte bancaire ne transite par nos serveurs.</li>
                 <li><strong>Selfie</strong> : s'il est utilisé, il est analysé en mémoire pour la recherche puis effacé immédiatement. Il n'est jamais enregistré.</li>
                 <li><strong>Statistiques</strong> : nombre de scans du QR code, de recherches et de téléchargements, sans identifier les personnes.</li>
             </ul>
@@ -29,6 +30,7 @@
             <ul>
                 <li>Permettre à un invité de retrouver ses photos d'un événement : <strong>consentement</strong> de l'invité, recueilli avant toute recherche faciale, et retirable à tout moment.</li>
                 <li>Livrer les photos des événements couverts par TRECHART (envoi, QR code, statistiques) : <strong>intérêt légitime</strong> et, le cas échéant, <strong>exécution du contrat</strong> conclu avec l'organisateur.</li>
+                <li>Vendre et livrer les photos achetées (commande, paiement, lien de téléchargement) : <strong>exécution du contrat</strong> ; conservation des preuves de paiement : <strong>obligation légale</strong>.</li>
                 <li>Sécurité du service et prévention des abus : <strong>intérêt légitime</strong>.</li>
             </ul>
             <p>Les empreintes faciales ne servent qu'à la recherche au sein d'un seul événement. Elles ne sont jamais comparées entre événements, vendues ni utilisées pour une autre finalité.</p>

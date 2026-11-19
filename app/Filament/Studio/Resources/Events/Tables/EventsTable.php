@@ -4,8 +4,10 @@ namespace App\Filament\Studio\Resources\Events\Tables;
 
 use App\Enums\AccessMode;
 use App\Enums\EventStatus;
+use App\Enums\EventType;
 use App\Filament\Studio\Resources\Events\EventResource;
 use App\Models\Event;
+use App\Models\Order;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
@@ -29,6 +31,12 @@ class EventsTable
                     ->searchable()
                     ->weight('semibold')
                     ->description(fn (Event $record) => collect([$record->event_date?->format('d/m/Y'), $record->location])->filter()->join(' · ')),
+                TextColumn::make('type')
+                    ->label('Type')
+                    ->badge()
+                    ->formatStateUsing(fn (EventType $state): string => $state === EventType::Client ? 'Personnalité' : 'Public')
+                    ->color(fn (EventType $state): string => $state === EventType::Client ? 'primary' : 'gray')
+                    ->description(fn (Event $record): ?string => $record->client_name),
                 TextColumn::make('slug')
                     ->label('Code invités')
                     ->formatStateUsing(fn (string $state): string => strtoupper($state))
@@ -48,6 +56,12 @@ class EventsTable
                 TextColumn::make('photos_count')->label('Photos')->numeric()->alignEnd(),
                 TextColumn::make('faces_count')->label('Visages')->numeric()->alignEnd()->toggleable(),
                 TextColumn::make('scans_count')->label('Scans')->numeric()->alignEnd(),
+                TextColumn::make('paid_orders_sum_amount')
+                    ->label('Ventes')
+                    ->sum('paidOrders', 'amount')
+                    ->formatStateUsing(fn ($state): string => Order::formatPrice((int) $state))
+                    ->placeholder('-')
+                    ->alignEnd(),
                 TextColumn::make('expires_at')
                     ->label('Expire le')
                     ->date('d/m/Y')

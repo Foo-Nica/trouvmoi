@@ -20,13 +20,17 @@
             <a href="{{ route('home') }}" class="shrink-0" aria-label="{{ config('app.name') }}">
                 <img src="{{ asset('images/logo-white.png') }}" alt="{{ config('app.name') }}" class="h-9 w-auto">
             </a>
-            <nav class="flex items-center gap-1 text-xs font-medium" aria-label="{{ __('Langue') }}">
-                @foreach (config('trouvmoi.locales') as $code => $label)
-                    <a href="{{ request()->fullUrlWithQuery(['lang' => $code]) }}"
-                       title="{{ $label }}"
-                       @class(['rounded-md px-2 py-1 uppercase', 'bg-white/20' => app()->getLocale() === $code, 'text-white/70 hover:text-white' => app()->getLocale() !== $code])>{{ $code }}</a>
-                @endforeach
-            </nav>
+            <label class="relative flex items-center gap-2 text-sm">
+                <span class="sr-only">{{ __('Langue') }}</span>
+                <svg class="pointer-events-none absolute left-2.5 h-4 w-4 text-white/70" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>
+                <select onchange="window.location = this.value"
+                        class="cursor-pointer appearance-none rounded-lg border border-white/25 bg-white/10 py-1.5 pl-8 pr-8 text-sm font-medium text-white focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent">
+                    @foreach (config('trouvmoi.locales') as $code => $label)
+                        <option value="{{ request()->fullUrlWithQuery(['lang' => $code]) }}" class="text-ink" @selected(app()->getLocale() === $code)>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <svg class="pointer-events-none absolute right-2.5 h-4 w-4 text-white/70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+            </label>
         </div>
     </header>
 

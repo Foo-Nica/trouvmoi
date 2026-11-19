@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\AccessMode;
+use App\Enums\EventType;
 use App\Enums\PhotoStatus;
 use App\Filament\Studio\Resources\Events\Pages\CreateEvent;
 use App\Filament\Studio\Resources\Events\Pages\EditEvent;
@@ -49,6 +50,53 @@ class StudioEventFormTest extends TestCase
         $this->assertSame($user->id, $event->user_id);
         $this->assertTrue($event->checkPin('4826'));
         $this->assertSame('2027-03-12', $event->expires_at->toDateString());
+    }
+
+    public function test_creates_a_personality_event_with_its_prices(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(CreateEvent::class)
+            ->fillForm([
+                'title' => 'Shooting portrait',
+                'type' => EventType::Client->value,
+                'client_name' => 'Mme Awa Mensah',
+                'original_price' => 2500,
+                'pack_price' => 20000,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $event = Event::sole();
+        $this->assertTrue($event->isClient());
+        $this->assertSame('Mme Awa Mensah', $event->client_name);
+        $this->assertSame(2500, $event->original_price);
+        $this->assertSame(20000, $event->packOffer());
+    }
+
+    public function test_personality_event_needs_the_personality_name(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(CreateEvent::class)
+            ->fillForm(['title' => 'Shooting', 'type' => EventType::Client->value])
+            ->call('create')
+            ->assertHasFormErrors(['client_name' => 'required']);
+    }
+
+    public function test_switching_a_public_event_without_watermark_to_personality_redoes_the_images(): void
+    {
+        Queue::fake();
+        $event = Event::factory()->create(['watermark_enabled' => false]);
+        $this->actingAs($event->owner);
+        Photo::factory()->for($event)->create(['thumb_path' => 't.webp']);
+
+        Livewire::test(EditEvent::class, ['record' => $event->getRouteKey()])
+            ->fillForm(['type' => EventType::Client->value, 'client_name' => 'Mme Awa Mensah'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        Queue::assertPushed(ProcessPhoto::class, fn (ProcessPhoto $job) => $job->indexFaces === false);
     }
 
     public function test_pin_is_required_when_pin_mode_is_chosen(): void

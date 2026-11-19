@@ -19,7 +19,7 @@ class PhotoRemover
         }
 
         Storage::disk(Photo::disk())->delete(array_filter([
-            $photo->original_path, $photo->thumb_path, $photo->preview_path, $photo->download_path,
+            $photo->original_path, $photo->thumb_path, $photo->preview_path, $photo->download_path, $photo->hd_path,
         ]));
 
         DB::transaction(function () use ($photo) {

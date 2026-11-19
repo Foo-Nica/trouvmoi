@@ -5,6 +5,7 @@ namespace App\Filament\Studio\Resources\Events\Widgets;
 use App\Enums\PhotoStatus;
 use App\Models\ConsentLog;
 use App\Models\Event;
+use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Model;
@@ -35,6 +36,9 @@ class EventStatsOverview extends StatsOverviewWidget
                 ->description($event->searches()->count().' recherches'),
             Stat::make('Photos téléchargées', number_format($downloads, 0, ',', ' '))
                 ->description($event->folders()->count().' dossiers créés'),
+            Stat::make('Ventes', Order::formatPrice($event->revenue()))
+                ->description($event->paidOrders()->count().' commande(s) payée(s)')
+                ->color('success'),
         ];
     }
 }

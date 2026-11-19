@@ -3,6 +3,7 @@
 namespace App\Filament\Studio\Resources\Events\Pages;
 
 use App\Enums\AccessMode;
+use App\Enums\EventType;
 use App\Filament\Studio\Resources\Events\EventResource;
 use App\Jobs\ProcessPhoto;
 use App\Jobs\PurgeEventFaces;
@@ -49,14 +50,14 @@ class EditEvent extends EditRecord
 
     protected function afterSave(): void
     {
-        // Filigrane activé ou retiré : les images déjà publiées sont refaites.
-        if ($this->record->wasChanged('watermark_enabled')) {
+        // Filigrane activé ou retiré (ou type changé) : les images déjà publiées sont refaites.
+        if ($this->record->wasChanged(['watermark_enabled', 'type']) && $this->previouslyWatermarked() !== $this->record->watermarksPreviews()) {
             $this->record->photos()->whereNotNull('thumb_path')->each(
                 fn (Photo $photo) => ProcessPhoto::dispatch($photo, indexFaces: false)
             );
 
             Notification::make()
-                ->title($this->record->watermark_enabled ? 'Ajout du filigrane en cours' : 'Retrait du filigrane en cours')
+                ->title($this->record->watermarksPreviews() ? 'Ajout du filigrane en cours' : 'Retrait du filigrane en cours')
                 ->body('Les photos déjà publiées sont mises à jour en arrière-plan.')
                 ->info()
                 ->send();
@@ -78,5 +79,15 @@ class EditEvent extends EditRecord
         if ($this->record->has_minors && $this->record->faces_count > 0) {
             PurgeEventFaces::dispatch($this->record);
         }
+    }
+
+    /** Les aperçus portaient-ils le logo avant cet enregistrement ? */
+    private function previouslyWatermarked(): bool
+    {
+        $previous = $this->record->getPrevious();
+        $type = $previous['type'] ?? $this->record->type;
+        $type = $type instanceof EventType ? $type : EventType::from($type);
+
+        return (bool) ($previous['watermark_enabled'] ?? $this->record->watermark_enabled) || $type === EventType::Client;
     }
 }

@@ -164,14 +164,15 @@ class StudioAndGuestPagesTest extends TestCase
         $this->get('/')->assertHeaderMissing('X-Robots-Tag');
     }
 
-    public function test_legal_pages_name_the_brand_without_plans(): void
+    public function test_legal_pages_name_the_brand_and_photo_sales_without_subscriptions(): void
     {
         $this->get(route('legal.privacy'))->assertOk()
             ->assertSee('Politique de confidentialité')
             ->assertSee(config('trouvmoi.legal.email'));
         $this->get(route('legal.terms'))->assertOk()
             ->assertSee(config('trouvmoi.legal.company'))
-            ->assertDontSee('FCFA');
+            ->assertSee('Achat des photos')
+            ->assertDontSee('FCFA par mois');
         $this->get('/')->assertSee(route('legal.privacy'));
     }
 

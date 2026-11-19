@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Guest;
 use App\Enums\AccessMode;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Guest\Concerns\ResolvesEvent;
+use App\Jobs\ProcessPhoto;
 use App\Models\Download;
 use App\Models\Event;
+use App\Models\Order;
 use App\Models\Photo;
 use App\Services\Guests\GuestSession;
+use App\Services\Orders\Cart;
+use App\Services\Orders\OrderPayments;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -66,6 +70,7 @@ class EventController extends Controller
             'consented' => $guests->hasConsented($event),
             'folders' => $guest ? $guest->folders()->where('event_id', $event->id)->latest()->get() : collect(),
             'firstPage' => $this->galleryVisible($event) ? $this->page($event, 1) : null,
+            'orders' => $guest ? Order::where('event_id', $event->id)->where('guest_id', $guest->id)->latest()->get() : collect(),
         ]);
     }
 
@@ -117,7 +122,7 @@ class EventController extends Controller
         return response()->json($this->page($event, max(1, (int) $request->query('page', 1))));
     }
 
-    public function photo(string $slug, string $photoId, GuestSession $guests): View
+    public function photo(string $slug, string $photoId, GuestSession $guests, Cart $cart, OrderPayments $orders): View
     {
         $event = $this->accessibleEvent($slug, $guests);
         abort_unless($this->galleryVisible($event), 404);
@@ -139,20 +144,41 @@ class EventController extends Controller
             'faces' => $faces,
             'consented' => $guests->hasConsented($event),
             'faceSearch' => $event->faceSearchEnabled(),
+            'price' => $event->priceFor($photo),
+            'inCart' => $cart->has($event, $photo),
+            'purchase' => $orders->purchasedPhotoIds($event, $guests->current())->orderFor($photo),
         ]);
     }
 
-    /** Téléchargement d'une photo depuis la galerie (version filigranée si activé). */
+    /** Téléchargement gratuit d'une photo d'un événement public (version avec logo si activé). */
     public function download(string $slug, string $photoId, GuestSession $guests): StreamedResponse
     {
         $event = $this->accessibleEvent($slug, $guests);
-        abort_unless($this->galleryVisible($event), 404);
+        abort_unless($this->galleryVisible($event) && $event->allowsFreeDownload(), 404);
         $photo = $this->eventPhoto($event, $photoId);
         abort_unless($photo->download_path, 404);
 
         Download::create(['event_id' => $event->id, 'guest_id' => $guests->current()?->id, 'type' => 'photo', 'photos_count' => 1]);
 
         return Storage::disk(Photo::disk())->download($photo->download_path, Str::slug($event->title).'-'.strtolower(substr($photo->id, -8)).'.jpg');
+    }
+
+    /** Version originale offerte : personnalité sans prix défini. */
+    public function original(string $slug, string $photoId, GuestSession $guests): StreamedResponse
+    {
+        $event = $this->accessibleEvent($slug, $guests);
+        abort_unless($this->galleryVisible($event), 404);
+        $photo = $this->eventPhoto($event, $photoId);
+        abort_unless($event->isClient() && $event->priceFor($photo) === 0, 404);
+
+        if (! $photo->hd_path) {
+            ProcessPhoto::dispatchSync($photo, indexFaces: false);
+            $photo->refresh();
+        }
+
+        Download::create(['event_id' => $event->id, 'guest_id' => $guests->current()?->id, 'type' => 'hd', 'photos_count' => 1]);
+
+        return Storage::disk(Photo::disk())->download($photo->hd_path, Str::slug($event->title).'-'.strtolower(substr($photo->id, -8)).'-original.jpg');
     }
 
     /** @return array{photos: list<array>, next: int|null, total: int} */
